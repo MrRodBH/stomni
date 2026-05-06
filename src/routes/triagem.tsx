@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import {
   triageApi,
+  uploadsApi,
   type AppointmentSlot,
   type AttendanceType,
   type TriageProcessResponse,
@@ -48,14 +49,20 @@ interface UploadFile {
   id: string;
   file: File;
   progress: number; // 0..100
-  done: boolean;
+  status: "uploading" | "done" | "error";
+  file_id?: string;
+  object_key?: string;
+  content_type: string;
+  errorMessage?: string;
+  abort?: AbortController;
 }
 
 type Step = "form" | "submitting" | "result" | "nps";
 
 function TriagePage() {
   const navigate = useNavigate();
-  const [patient, setPatient] = useState(() => loadPatient());
+  const [patient, setPatient] = useState<ReturnType<typeof loadPatient>>(null);
+  useEffect(() => { setPatient(loadPatient()); }, []);
   const [type, setType] = useState<AttendanceType | "">("");
   const [files, setFiles] = useState<UploadFile[]>([]);
   const [drag, setDrag] = useState(false);
@@ -98,28 +105,73 @@ function TriagePage() {
         toast.error(`${f.name}: máximo 10MB`);
         return;
       }
-      next.push({ id: Math.random().toString(36).slice(2), file: f, progress: 0, done: false });
+      next.push({
+        id: Math.random().toString(36).slice(2),
+        file: f,
+        progress: 0,
+        status: "uploading",
+        content_type: f.type,
+      });
     });
     setFiles((prev) => [...prev, ...next]);
-    next.forEach(simulateUpload);
+    next.forEach(startUpload);
   };
 
-  const simulateUpload = (uf: UploadFile) => {
-    let p = 0;
-    const tick = () => {
-      p = Math.min(100, p + Math.random() * 22 + 8);
-      setFiles((prev) => prev.map((x) => x.id === uf.id ? { ...x, progress: p, done: p >= 100 } : x));
-      if (p < 100) setTimeout(tick, 220);
-    };
-    setTimeout(tick, 200);
+  const startUpload = async (uf: UploadFile) => {
+    const ctrl = new AbortController();
+    setFiles((prev) =>
+      prev.map((x) => (x.id === uf.id ? { ...x, abort: ctrl, status: "uploading", progress: 0, errorMessage: undefined } : x)),
+    );
+    try {
+      const signed = await uploadsApi.sign(uf.file);
+      await uploadsApi.uploadWithProgress(
+        signed,
+        uf.file,
+        (pct) =>
+          setFiles((prev) => prev.map((x) => (x.id === uf.id ? { ...x, progress: pct } : x))),
+        ctrl.signal,
+      );
+      const confirmed = await uploadsApi.confirm({
+        object_key: signed.object_key,
+        filename: uf.file.name,
+        size: uf.file.size,
+        content_type: uf.file.type,
+      });
+      setFiles((prev) =>
+        prev.map((x) =>
+          x.id === uf.id
+            ? { ...x, status: "done", progress: 100, file_id: confirmed.file_id, object_key: confirmed.object_key }
+            : x,
+        ),
+      );
+    } catch (err: any) {
+      if (err?.message === "aborted") return;
+      toast.error(`Falha no envio de ${uf.file.name}. Tente novamente.`);
+      setFiles((prev) =>
+        prev.map((x) =>
+          x.id === uf.id ? { ...x, status: "error", errorMessage: err?.message ?? "Erro" } : x,
+        ),
+      );
+    }
   };
 
-  const removeFile = (id: string) =>
-    setFiles((prev) => prev.filter((f) => f.id !== id));
+  const retryUpload = (id: string) => {
+    const uf = files.find((f) => f.id === id);
+    if (uf) startUpload(uf);
+  };
+
+  const removeFile = (id: string) => {
+    setFiles((prev) => {
+      const target = prev.find((f) => f.id === id);
+      target?.abort?.abort();
+      return prev.filter((f) => f.id !== id);
+    });
+  };
 
   const canSubmit = useMemo(() => {
-    return Boolean(type && date && time && patient);
-  }, [type, date, time, patient]);
+    const filesReady = files.every((f) => f.status === "done");
+    return Boolean(type && date && time && patient && filesReady);
+  }, [type, date, time, patient, files]);
 
   const submit = async () => {
     if (!canSubmit || !patient || !date) return;
@@ -131,7 +183,15 @@ function TriagePage() {
         date: format(date, "yyyy-MM-dd"),
         time,
         notes: notes.trim() || undefined,
-        files: files.map((f) => ({ name: f.file.name, size: f.file.size })),
+        files: files
+          .filter((f) => f.status === "done" && f.file_id)
+          .map((f) => ({
+            file_id: f.file_id!,
+            name: f.file.name,
+            size: f.file.size,
+            content_type: f.content_type,
+            object_key: f.object_key,
+          })),
       });
       setResult(res);
       setStep("result");

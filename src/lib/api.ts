@@ -59,7 +59,33 @@ export interface TriageProcessRequest {
   date: string; // ISO yyyy-MM-dd
   time: string;
   notes?: string;
-  files?: { name: string; size: number }[];
+  files?: TriageFileRef[];
+}
+
+export interface TriageFileRef {
+  file_id: string;
+  name: string;
+  size: number;
+  content_type: string;
+  object_key?: string;
+}
+
+export interface SignedUploadResponse {
+  upload_url: string;
+  object_key: string;
+  method?: "PUT" | "POST";
+  headers?: Record<string, string>;
+  expires_in?: number;
+  mock?: boolean;
+}
+
+export interface ConfirmedUpload {
+  file_id: string;
+  object_key: string;
+  filename: string;
+  size: number;
+  content_type: string;
+  url?: string;
 }
 
 export interface TriageProcessResponse {

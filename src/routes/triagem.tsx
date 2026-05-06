@@ -277,9 +277,21 @@ function TriagePage() {
                             <p className="truncate text-sm font-medium">{f.file.name}</p>
                             <p className="text-xs text-muted-foreground">
                               {(f.file.size/1024).toFixed(1)} KB
-                              {f.done ? " · enviado" : ` · ${Math.round(f.progress)}%`}
+                              {f.status === "done"
+                                ? " · enviado"
+                                : f.status === "error"
+                                ? " · falha no envio"
+                                : ` · ${Math.round(f.progress)}%`}
                             </p>
                           </div>
+                          {f.status === "error" && (
+                            <button
+                              onClick={() => retryUpload(f.id)}
+                              className="text-xs font-medium text-primary hover:underline"
+                            >
+                              Tentar novamente
+                            </button>
+                          )}
                           <button
                             onClick={() => removeFile(f.id)}
                             className="text-muted-foreground hover:text-destructive"

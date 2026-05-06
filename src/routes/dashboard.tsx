@@ -2,111 +2,168 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { dashboardApi, type QueuePatient, type UrgencyLevel } from "@/lib/api";
-import { Clock, RefreshCw, User } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
+  ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, YAxis,
+  Tooltip, CartesianGrid, Cell,
+} from "recharts";
+import { Activity, AlarmClock, Stethoscope, TrendingUp } from "lucide-react";
+import { analyticsApi, type AnalyticsMetrics } from "@/lib/api";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
       { title: "Dashboard — STOMNI" },
-      { name: "description", content: "Acompanhe a fila de triagens em tempo real." },
+      { name: "description", content: "Volume e mix de atendimentos da clínica." },
     ],
   }),
   component: DashboardPage,
 });
 
-const MOCK: QueuePatient[] = [
-  { id: "p1", name: "Maria Silva", reason: "Dor torácica há 30min", classification: "high", confidence: 0.92, waiting_since: new Date(Date.now() - 5*60000).toISOString(), last_messages: ["Sinto aperto no peito", "Falta de ar leve"] },
-  { id: "p2", name: "João Pereira", reason: "Febre e dor de garganta", classification: "medium", confidence: 0.78, waiting_since: new Date(Date.now() - 12*60000).toISOString(), last_messages: ["Febre 38.5", "Dor há 2 dias"] },
-  { id: "p3", name: "Ana Costa", reason: "Avaliação odontológica de rotina", classification: "low", confidence: 0.85, waiting_since: new Date(Date.now() - 22*60000).toISOString(), last_messages: ["Quero marcar limpeza"] },
-];
+type Range = "hour" | "day" | "month" | "custom";
 
 function DashboardPage() {
-  const [patients, setPatients] = useState<QueuePatient[]>(MOCK);
-  const [loading, setLoading] = useState(false);
+  const [range, setRange] = useState<Range>("day");
+  const [metrics, setMetrics] = useState<AnalyticsMetrics | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const refresh = async () => {
+  useEffect(() => {
     setLoading(true);
-    try {
-      const data = await dashboardApi.list();
-      if (Array.isArray(data) && data.length) setPatients(data);
-    } catch {
-      // Backend ainda não disponível — mantém mock
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { refresh(); }, []);
+    analyticsApi.metrics(range)
+      .then(setMetrics)
+      .finally(() => setLoading(false));
+  }, [range]);
 
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <div className="mx-auto max-w-6xl px-6 py-10">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Fila de triagens</h1>
-            <p className="text-sm text-muted-foreground">Pacientes aguardando avaliação clínica.</p>
+            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-sm text-muted-foreground">Volume e mix de atendimentos da clínica.</p>
           </div>
-          <Button variant="outline" onClick={refresh} disabled={loading}>
-            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Atualizar
-          </Button>
+          <div className="w-44">
+            <Select value={range} onValueChange={(v) => setRange(v as Range)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hour">Por hora</SelectItem>
+                <SelectItem value="day">Por dia</SelectItem>
+                <SelectItem value="month">Por mês</SelectItem>
+                <SelectItem value="custom">Período customizado</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {patients.map((p) => (
-            <Card key={p.id} className="overflow-hidden">
-              <div className={`h-1 w-full ${barColor(p.classification)}`} />
-              <div className="space-y-3 p-5">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-full bg-muted">
-                      <User className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">{p.name}</p>
-                      <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Clock className="h-3 w-3" /> {minutesAgo(p.waiting_since)} min
-                      </p>
-                    </div>
-                  </div>
-                  <UrgencyChip level={p.classification} />
-                </div>
-                <p className="text-sm text-foreground">{p.reason}</p>
-                <div className="rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
-                  {p.last_messages.slice(-2).map((m, i) => (
-                    <p key={i} className="truncate">"{m}"</p>
-                  ))}
-                </div>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Confiança IA: {Math.round(p.confidence * 100)}%</span>
-                  <Button size="sm" variant="ghost">Atender</Button>
-                </div>
-              </div>
-            </Card>
-          ))}
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Kpi icon={Activity} label="Em andamento" value={loading ? null : metrics?.in_progress ?? 0} />
+          <Kpi icon={Stethoscope} label="Abertos agora" value={loading ? null : metrics?.open_now ?? 0} />
+          <Kpi icon={AlarmClock} label="Espera média" value={loading ? null : `${metrics?.avg_wait_minutes ?? 0} min`} />
+          <Kpi icon={TrendingUp} label="NPS médio" value={loading ? null : (metrics?.nps_avg ?? 0).toFixed(1)} />
+        </div>
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-5">
+          <Card className="p-5 lg:col-span-3">
+            <h2 className="text-sm font-semibold">Volume de atendimentos</h2>
+            <p className="text-xs text-muted-foreground">Evolução conforme o filtro selecionado.</p>
+            <div className="mt-4 h-72">
+              {loading || !metrics ? (
+                <Skeleton className="h-full w-full" />
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={metrics.volume_series} margin={{ top: 10, right: 16, left: -10, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                    <XAxis dataKey="label" stroke="var(--color-muted-foreground)" fontSize={12} />
+                    <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
+                    <Tooltip
+                      contentStyle={{
+                        background: "var(--color-card)",
+                        border: "1px solid var(--color-border)",
+                        borderRadius: 8,
+                        fontSize: 12,
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="var(--color-primary)"
+                      strokeWidth={2.5}
+                      dot={{ r: 3, fill: "var(--color-primary)" }}
+                      activeDot={{ r: 5 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </Card>
+
+          <Card className="p-5 lg:col-span-2">
+            <h2 className="text-sm font-semibold">Mix por tipo</h2>
+            <p className="text-xs text-muted-foreground">Emergências destacadas em vermelho.</p>
+            <div className="mt-4 h-72">
+              {loading || !metrics ? (
+                <Skeleton className="h-full w-full" />
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={metrics.mix} margin={{ top: 10, right: 8, left: -16, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                    <XAxis dataKey="label" stroke="var(--color-muted-foreground)" fontSize={11} />
+                    <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
+                    <Tooltip
+                      contentStyle={{
+                        background: "var(--color-card)",
+                        border: "1px solid var(--color-border)",
+                        borderRadius: 8,
+                        fontSize: 12,
+                      }}
+                    />
+                    <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                      {metrics.mix.map((m) => (
+                        <Cell
+                          key={m.type}
+                          fill={
+                            m.type === "emergencia"
+                              ? "var(--color-urgency-high)"
+                              : m.type === "cancelamento"
+                              ? "var(--color-urgency-medium)"
+                              : "var(--color-primary)"
+                          }
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </Card>
         </div>
       </div>
     </div>
   );
 }
 
-function minutesAgo(iso: string) {
-  return Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
-}
-
-function barColor(l: UrgencyLevel) {
-  return l === "high" ? "bg-urgency-high" : l === "medium" ? "bg-urgency-medium" : "bg-urgency-low";
-}
-
-function UrgencyChip({ level }: { level: UrgencyLevel }) {
-  const m = {
-    low: { label: "Baixa", c: "bg-urgency-low" },
-    medium: { label: "Média", c: "bg-urgency-medium" },
-    high: { label: "Alta", c: "bg-urgency-high" },
-  }[level];
+function Kpi({
+  icon: Icon, label, value,
+}: { icon: any; label: string; value: number | string | null }) {
   return (
-    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium text-white ${m.c}`}>{m.label}</span>
+    <Card className="flex items-center gap-4 p-5">
+      <div className="grid h-11 w-11 place-items-center rounded-lg bg-accent text-primary">
+        <Icon className="h-5 w-5" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
+        {value === null ? (
+          <Skeleton className="mt-1 h-6 w-16" />
+        ) : (
+          <p className="text-2xl font-bold">{value}</p>
+        )}
+      </div>
+    </Card>
   );
 }

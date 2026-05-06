@@ -76,11 +76,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "STOMNI — Triagem Omnichannel para Clínicas" },
       { name: "description", content: "Plataforma de triagem inteligente para clínicas médicas e odontológicas." },
       { name: "author", content: "STOMNI" },
-      { property: "og:title", content: "STOMNI" },
-      { property: "og:description", content: "Triagem omnichannel inteligente." },
+      { property: "og:title", content: "STOMNI — Triagem Omnichannel para Clínicas" },
+      { property: "og:description", content: "Plataforma de triagem inteligente para clínicas médicas e odontológicas." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "STOMNI — Triagem Omnichannel para Clínicas" },
+      { name: "twitter:description", content: "Plataforma de triagem inteligente para clínicas médicas e odontológicas." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5fedad38-3406-4e6c-8b59-603af377cbeb/id-preview-dce38740--6e44b22b-6213-4a13-b85e-d88c2c5c8391.lovable.app-1778098321472.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5fedad38-3406-4e6c-8b59-603af377cbeb/id-preview-dce38740--6e44b22b-6213-4a13-b85e-d88c2c5c8391.lovable.app-1778098321472.png" },
     ],
     links: [
       {

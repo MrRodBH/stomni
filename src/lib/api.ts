@@ -59,7 +59,33 @@ export interface TriageProcessRequest {
   date: string; // ISO yyyy-MM-dd
   time: string;
   notes?: string;
-  files?: { name: string; size: number }[];
+  files?: TriageFileRef[];
+}
+
+export interface TriageFileRef {
+  file_id: string;
+  name: string;
+  size: number;
+  content_type: string;
+  object_key?: string;
+}
+
+export interface SignedUploadResponse {
+  upload_url: string;
+  object_key: string;
+  method?: "PUT" | "POST";
+  headers?: Record<string, string>;
+  expires_in?: number;
+  mock?: boolean;
+}
+
+export interface ConfirmedUpload {
+  file_id: string;
+  object_key: string;
+  filename: string;
+  size: number;
+  content_type: string;
+  url?: string;
 }
 
 export interface TriageProcessResponse {
@@ -234,5 +260,83 @@ export const dashboardApi = {
       if (Array.isArray(data)) return data;
     } catch {}
     return [];
+  },
+};
+
+export const uploadsApi = {
+  sign: async (file: File): Promise<SignedUploadResponse> => {
+    try {
+      const { data } = await api.post<SignedUploadResponse>("/uploads/sign", {
+        filename: file.name,
+        content_type: file.type,
+        size: file.size,
+      });
+      if (data && data.upload_url) return data;
+    } catch {}
+    return {
+      upload_url: "mock://upload",
+      object_key: `mock/${Date.now()}-${file.name}`,
+      method: "PUT",
+      mock: true,
+    };
+  },
+  confirm: async (meta: {
+    object_key: string;
+    filename: string;
+    size: number;
+    content_type: string;
+  }): Promise<ConfirmedUpload> => {
+    try {
+      const { data } = await api.post<ConfirmedUpload>("/uploads/confirm", meta);
+      if (data && data.file_id) return data;
+    } catch {}
+    return {
+      file_id: "mock-" + Math.random().toString(36).slice(2, 10),
+      object_key: meta.object_key,
+      filename: meta.filename,
+      size: meta.size,
+      content_type: meta.content_type,
+    };
+  },
+  uploadWithProgress: (
+    signed: SignedUploadResponse,
+    file: File,
+    onProgress: (pct: number) => void,
+    signal?: AbortSignal,
+  ): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      // Mock mode: simulate progress without network
+      if (signed.mock) {
+        let p = 0;
+        const tick = () => {
+          if (signal?.aborted) return reject(new Error("aborted"));
+          p = Math.min(100, p + Math.random() * 22 + 10);
+          onProgress(p);
+          if (p < 100) setTimeout(tick, 180);
+          else resolve();
+        };
+        setTimeout(tick, 150);
+        return;
+      }
+      const xhr = new XMLHttpRequest();
+      xhr.open(signed.method ?? "PUT", signed.upload_url, true);
+      const headers = signed.headers ?? { "Content-Type": file.type };
+      Object.entries(headers).forEach(([k, v]) => xhr.setRequestHeader(k, v));
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) onProgress((e.loaded / e.total) * 100);
+      };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          onProgress(100);
+          resolve();
+        } else {
+          reject(new Error(`Upload failed (${xhr.status})`));
+        }
+      };
+      xhr.onerror = () => reject(new Error("Network error"));
+      xhr.onabort = () => reject(new Error("aborted"));
+      signal?.addEventListener("abort", () => xhr.abort());
+      xhr.send(file);
+    });
   },
 };

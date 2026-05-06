@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL =
   (import.meta as any).env?.VITE_API_URL ||
-  "https://api.stomni.com.br/v1";
+  "https://api.stomni.com.br/api/v1";
 
 function getCookie(name: string): string | null {
   if (typeof document === "undefined") return null;

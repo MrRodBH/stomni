@@ -169,7 +169,7 @@ function HomePage() {
                   onClick={() => submit("agendamento")}
                 >
                   <CalendarPlus className="mr-2 h-4 w-4" />
-                  Agendamento
+                  Agendar Consulta
                 </Button>
               </div>
             </form>

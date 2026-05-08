@@ -18,7 +18,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { advancedAnalyticsApi, analyticsApi, type AdvancedAnalytics } from "@/lib/api";
+import {
+  abandonmentApi,
+  advancedAnalyticsApi,
+  analyticsApi,
+  type AbandonmentAnalytics,
+  type AdvancedAnalytics,
+} from "@/lib/api";
+import { Badge } from "@/components/ui/badge";
+import { ChevronDown, ChevronUp, Lightbulb } from "lucide-react";
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({
@@ -55,6 +63,12 @@ function AdminDashboard() {
   });
 
   const data = advQuery.data;
+
+  const abandonQuery = useQuery({
+    queryKey: ["analytics-abandonment", fromStr, toStr],
+    queryFn: () => abandonmentApi.get(fromStr, toStr),
+    staleTime: 60_000,
+  });
 
   const setShortcut = (s: "7" | "30" | "90" | "this" | "last") => {
     const today = new Date();
@@ -121,15 +135,23 @@ function AdminDashboard() {
       )}
 
       {data && data.totals.triages > 0 && (
-        <DashboardContent data={data} insights={insightsQuery.data?.ai_insights ?? []} />
+        <DashboardContent
+          data={data}
+          insights={insightsQuery.data?.ai_insights ?? []}
+          abandonment={abandonQuery.data}
+        />
       )}
     </div>
   );
 }
 
 function DashboardContent({
-  data, insights,
-}: { data: AdvancedAnalytics; insights: string[] }) {
+  data, insights, abandonment,
+}: {
+  data: AdvancedAnalytics;
+  insights: string[];
+  abandonment?: AbandonmentAnalytics;
+}) {
   const funnelData = useMemo(() => {
     const top = data.funnel[0]?.value || 1;
     return data.funnel.map((f) => ({
@@ -260,6 +282,8 @@ function DashboardContent({
           </div>
         </Card>
       </div>
+
+      {abandonment && <AbandonmentCard data={abandonment} />}
 
       {/* CSAT + Insights */}
       <div className="grid gap-4 lg:grid-cols-2">

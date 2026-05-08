@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as TriagemSessionIdRouteImport } from './routes/triagem.$sessionId'
 import { Route as SignupSucessoRouteImport } from './routes/signup.sucesso'
+import { Route as SignupCanceladoRouteImport } from './routes/signup.cancelado'
 import { Route as AdminUnidadesRouteImport } from './routes/admin.unidades'
 import { Route as AdminTriagensRouteImport } from './routes/admin.triagens'
 import { Route as AdminProfissionaisRouteImport } from './routes/admin.profissionais'
@@ -77,6 +78,11 @@ const SignupSucessoRoute = SignupSucessoRouteImport.update({
   path: '/signup/sucesso',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupCanceladoRoute = SignupCanceladoRouteImport.update({
+  id: '/signup/cancelado',
+  path: '/signup/cancelado',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminUnidadesRoute = AdminUnidadesRouteImport.update({
   id: '/unidades',
   path: '/unidades',
@@ -128,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
+  '/signup/cancelado': typeof SignupCanceladoRoute
   '/signup/sucesso': typeof SignupSucessoRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -146,6 +153,7 @@ export interface FileRoutesByTo {
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
+  '/signup/cancelado': typeof SignupCanceladoRoute
   '/signup/sucesso': typeof SignupSucessoRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin': typeof AdminIndexRoute
@@ -166,6 +174,7 @@ export interface FileRoutesById {
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
+  '/signup/cancelado': typeof SignupCanceladoRoute
   '/signup/sucesso': typeof SignupSucessoRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -187,6 +196,7 @@ export interface FileRouteTypes {
     | '/admin/profissionais'
     | '/admin/triagens'
     | '/admin/unidades'
+    | '/signup/cancelado'
     | '/signup/sucesso'
     | '/triagem/$sessionId'
     | '/admin/'
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/admin/profissionais'
     | '/admin/triagens'
     | '/admin/unidades'
+    | '/signup/cancelado'
     | '/signup/sucesso'
     | '/triagem/$sessionId'
     | '/admin'
@@ -224,6 +235,7 @@ export interface FileRouteTypes {
     | '/admin/profissionais'
     | '/admin/triagens'
     | '/admin/unidades'
+    | '/signup/cancelado'
     | '/signup/sucesso'
     | '/triagem/$sessionId'
     | '/admin/'
@@ -238,6 +250,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PrecosRoute: typeof PrecosRoute
   TriagemRoute: typeof TriagemRouteWithChildren
+  SignupCanceladoRoute: typeof SignupCanceladoRoute
   SignupSucessoRoute: typeof SignupSucessoRoute
 }
 
@@ -311,6 +324,13 @@ declare module '@tanstack/react-router' {
       path: '/signup/sucesso'
       fullPath: '/signup/sucesso'
       preLoaderRoute: typeof SignupSucessoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup/cancelado': {
+      id: '/signup/cancelado'
+      path: '/signup/cancelado'
+      fullPath: '/signup/cancelado'
+      preLoaderRoute: typeof SignupCanceladoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/unidades': {
@@ -417,6 +437,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PrecosRoute: PrecosRoute,
   TriagemRoute: TriagemRouteWithChildren,
+  SignupCanceladoRoute: SignupCanceladoRoute,
   SignupSucessoRoute: SignupSucessoRoute,
 }
 export const routeTree = rootRouteImport

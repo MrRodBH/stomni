@@ -545,10 +545,14 @@ function ScheduleStep({
   const [clinics, setClinics] = useState<Clinic[]>([]);
   const [name, setName] = useState(session.patient_hint?.full_name ?? "");
   const [phone, setPhone] = useState(session.patient_hint?.whatsapp ?? "");
-  const [clinicId, setClinicId] = useState(session.patient_hint?.clinic_id ?? "");
+  const [clinicId, setClinicId] = useState(
+    session.suggested_booking?.clinic_id ?? session.patient_hint?.clinic_id ?? "",
+  );
   const [consent, setConsent] = useState(false);
   const [type, setType] = useState<AttendanceType>(session.is_emergency ? "emergencia" : "consulta");
-  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [date, setDate] = useState<Date | undefined>(
+    session.suggested_booking?.date ? parseISO(session.suggested_booking.date) : undefined,
+  );
   const [slots, setSlots] = useState<AppointmentSlot[] | null>(null);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [time, setTime] = useState("");

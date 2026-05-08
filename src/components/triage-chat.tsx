@@ -45,6 +45,7 @@ export function TriageChat({ sessionId }: TriageChatProps) {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [step, setStep] = useState<Step>("chat");
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Resume flow
@@ -196,6 +197,26 @@ export function TriageChat({ sessionId }: TriageChatProps) {
 
             {session?.state === "assessment" && (
               <AssessmentCard session={session} onContinue={() => setStep("schedule")} />
+            )}
+
+            {session?.state === "assessment" && session.suggested_booking && (
+              <SuggestedBookingCard
+                booking={session.suggested_booking}
+                onConfirm={() => setShowConfirmDialog(true)}
+                onChooseOther={() => setStep("schedule")}
+              />
+            )}
+
+            {session && session.suggested_booking && (
+              <ConfirmSuggestionDialog
+                open={showConfirmDialog}
+                onOpenChange={setShowConfirmDialog}
+                session={session}
+                onConfirmed={(s) => {
+                  setSession(s);
+                  setShowConfirmDialog(false);
+                }}
+              />
             )}
 
             {session?.state === "confirmed" && (

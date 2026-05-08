@@ -15,6 +15,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as TriagemSessionIdRouteImport } from './routes/triagem.$sessionId'
 import { Route as AdminUnidadesRouteImport } from './routes/admin.unidades'
 import { Route as AdminProfissionaisRouteImport } from './routes/admin.profissionais'
 import { Route as AdminEspecialidadesRouteImport } from './routes/admin.especialidades'
@@ -50,6 +51,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const TriagemSessionIdRoute = TriagemSessionIdRouteImport.update({
+  id: '/$sessionId',
+  path: '/$sessionId',
+  getParentRoute: () => TriagemRoute,
+} as any)
 const AdminUnidadesRoute = AdminUnidadesRouteImport.update({
   id: '/unidades',
   path: '/unidades',
@@ -77,10 +83,11 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/triagem': typeof TriagemRoute
+  '/triagem': typeof TriagemRouteWithChildren
   '/admin/especialidades': typeof AdminEspecialidadesRoute
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/unidades': typeof AdminUnidadesRoute
+  '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/profissionais/$id/horarios': typeof AdminProfissionaisIdHorariosRoute
 }
@@ -88,10 +95,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/triagem': typeof TriagemRoute
+  '/triagem': typeof TriagemRouteWithChildren
   '/admin/especialidades': typeof AdminEspecialidadesRoute
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/unidades': typeof AdminUnidadesRoute
+  '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin': typeof AdminIndexRoute
   '/admin/profissionais/$id/horarios': typeof AdminProfissionaisIdHorariosRoute
 }
@@ -101,10 +109,11 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/triagem': typeof TriagemRoute
+  '/triagem': typeof TriagemRouteWithChildren
   '/admin/especialidades': typeof AdminEspecialidadesRoute
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/unidades': typeof AdminUnidadesRoute
+  '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/profissionais/$id/horarios': typeof AdminProfissionaisIdHorariosRoute
 }
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/admin/especialidades'
     | '/admin/profissionais'
     | '/admin/unidades'
+    | '/triagem/$sessionId'
     | '/admin/'
     | '/admin/profissionais/$id/horarios'
   fileRoutesByTo: FileRoutesByTo
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/admin/especialidades'
     | '/admin/profissionais'
     | '/admin/unidades'
+    | '/triagem/$sessionId'
     | '/admin'
     | '/admin/profissionais/$id/horarios'
   id:
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/admin/especialidades'
     | '/admin/profissionais'
     | '/admin/unidades'
+    | '/triagem/$sessionId'
     | '/admin/'
     | '/admin/profissionais/$id/horarios'
   fileRoutesById: FileRoutesById
@@ -151,7 +163,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
-  TriagemRoute: typeof TriagemRoute
+  TriagemRoute: typeof TriagemRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -197,6 +209,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/triagem/$sessionId': {
+      id: '/triagem/$sessionId'
+      path: '/$sessionId'
+      fullPath: '/triagem/$sessionId'
+      preLoaderRoute: typeof TriagemSessionIdRouteImport
+      parentRoute: typeof TriagemRoute
     }
     '/admin/unidades': {
       id: '/admin/unidades'
@@ -256,12 +275,23 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface TriagemRouteChildren {
+  TriagemSessionIdRoute: typeof TriagemSessionIdRoute
+}
+
+const TriagemRouteChildren: TriagemRouteChildren = {
+  TriagemSessionIdRoute: TriagemSessionIdRoute,
+}
+
+const TriagemRouteWithChildren =
+  TriagemRoute._addFileChildren(TriagemRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
-  TriagemRoute: TriagemRoute,
+  TriagemRoute: TriagemRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

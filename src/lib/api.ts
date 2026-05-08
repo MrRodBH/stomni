@@ -207,6 +207,17 @@ export const triageApi = {
     return data;
   },
 
+  confirmSuggestion: async (
+    id: string,
+    patient: { full_name: string; whatsapp: string; clinic_id: string; consent: boolean },
+  ): Promise<TriageProcessResponse> => {
+    const { data } = await api.post<TriageProcessResponse>(
+      `/triage/sessions/${id}/confirm-suggestion`,
+      patient,
+    );
+    return data;
+  },
+
   // ===== Legacy single-shot triage (kept for compat) =====
   process: async (payload: TriageProcessRequest): Promise<TriageProcessResponse> => {
     try {

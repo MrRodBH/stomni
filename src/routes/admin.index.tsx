@@ -457,3 +457,116 @@ const tooltipStyle = {
   borderRadius: 8,
   fontSize: 12,
 } as const;
+
+function AbandonmentCard({ data }: { data: AbandonmentAnalytics }) {
+  const [showSamples, setShowSamples] = useState(false);
+
+  const turnData = useMemo(() => {
+    const max = Math.max(1, ...data.by_turn.map((t) => t.value));
+    return data.by_turn.map((t) => {
+      const ratio = t.value / max;
+      // earlier abandons (first buckets) get darker red
+      const intensity = 0.45 + (1 - ratio) * 0.25;
+      return { ...t, fill: `rgba(220, 38, 38, ${intensity.toFixed(2)})` };
+    });
+  }, [data.by_turn]);
+
+  return (
+    <Card className="border-orange-200 bg-orange-50/60 p-5 dark:bg-orange-950/20">
+      <div className="flex items-start gap-2">
+        <AlertTriangle className="mt-0.5 h-5 w-5 text-orange-600" />
+        <div>
+          <h2 className="text-sm font-semibold">Onde os pacientes desistem</h2>
+          <p className="text-xs text-muted-foreground">
+            Identifique pontos de fricção na jornada para reduzir o abandono.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        <MiniStat label="Abandonadas" value={data.total_abandoned.toLocaleString("pt-BR")} tone="bad" />
+        <MiniStat label="Taxa de abandono" value={`${data.abandonment_rate_pct.toFixed(1)}%`} tone="warn" />
+        <MiniStat label="Total iniciadas" value={data.total_started.toLocaleString("pt-BR")} tone="neutral" />
+      </div>
+
+      <div className="mt-5 grid gap-5 lg:grid-cols-2">
+        <div>
+          <p className="text-xs font-medium text-muted-foreground">Em que turno desistem</p>
+          <div className="mt-2 h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={turnData} layout="vertical" margin={{ left: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                <XAxis type="number" fontSize={11} stroke="var(--color-muted-foreground)" />
+                <YAxis type="category" dataKey="bucket" fontSize={11} width={80} stroke="var(--color-muted-foreground)" />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Bar dataKey="value" radius={[0, 6, 6, 0]}>
+                  {turnData.map((t, i) => (
+                    <Cell key={i} fill={t.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div>
+          <p className="text-xs font-medium text-muted-foreground">Queixas mais frequentes em abandonadas</p>
+          {data.top_abandonment_complaints.length === 0 ? (
+            <p className="mt-3 text-sm text-muted-foreground">Sem dados suficientes.</p>
+          ) : (
+            <ul className="mt-2 space-y-1.5">
+              {data.top_abandonment_complaints.slice(0, 5).map((c, i) => (
+                <li key={i} className="flex items-center justify-between gap-3 rounded-md bg-background/60 px-3 py-2 text-sm">
+                  <span className="truncate">{c.complaint}</span>
+                  <Badge variant="secondary">{c.count}</Badge>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      {data.last_user_messages_sample.length > 0 && (
+        <div className="mt-5">
+          <button
+            type="button"
+            onClick={() => setShowSamples((v) => !v)}
+            className="flex items-center gap-1.5 text-xs font-medium text-foreground hover:text-primary"
+          >
+            {showSamples ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+            Ver últimas mensagens dos pacientes que abandonaram
+          </button>
+          {showSamples && (
+            <ul className="mt-3 space-y-2">
+              {data.last_user_messages_sample.slice(0, 10).map((m, i) => (
+                <li key={i} className="rounded-md border border-border/60 bg-background/60 px-3 py-2 text-sm italic text-muted-foreground">
+                  “{m}”
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      <div className="mt-5 flex items-start gap-2 rounded-md border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900 dark:bg-blue-950/30 dark:text-blue-200">
+        <Lightbulb className="mt-0.5 h-4 w-4 shrink-0" />
+        <span>
+          Dica: use estas amostras para ajustar o tom do assistente em{" "}
+          <span className="font-medium">/admin/configuracoes → IA da Triagem</span>.
+        </span>
+      </div>
+    </Card>
+  );
+}
+
+function MiniStat({
+  label, value, tone,
+}: { label: string; value: string; tone: "bad" | "warn" | "neutral" }) {
+  const color = tone === "bad" ? "text-red-600" : tone === "warn" ? "text-amber-600" : "text-foreground";
+  return (
+    <div className="rounded-md border border-border/60 bg-background/60 px-3 py-2">
+      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className={cn("mt-0.5 text-xl font-bold", color)}>{value}</p>
+    </div>
+  );
+}

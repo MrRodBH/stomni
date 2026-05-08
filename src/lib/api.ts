@@ -745,6 +745,8 @@ export interface AdminTriageSessionItem {
   created_at: string;
   updated_at: string;
   linked_triage_id: string | null;
+  patient_whatsapp_normalized?: string | null;
+  patient_name?: string | null;
 }
 
 export const adminTriageApi = {

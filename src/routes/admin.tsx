@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-r
 import { SiteHeader } from "@/components/site-header";
 import { RequireAuth, ADMIN_ROLES, useAuth, useLogout } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Stethoscope, Users, Building2, LogOut } from "lucide-react";
+import { LayoutDashboard, Stethoscope, Users, Building2, LogOut, BookOpen } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -16,6 +16,7 @@ const NAV: { to: string; label: string; icon: any; exact?: boolean }[] = [
   { to: "/admin/especialidades", label: "Especialidades", icon: Stethoscope },
   { to: "/admin/profissionais", label: "Profissionais", icon: Users },
   { to: "/admin/unidades", label: "Unidades", icon: Building2 },
+  { to: "/admin/conhecimento", label: "Conhecimento", icon: BookOpen },
 ];
 
 function AdminLayout() {

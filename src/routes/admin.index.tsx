@@ -73,6 +73,12 @@ function AdminDashboard() {
     staleTime: 60_000,
   });
 
+  const quotaQuery = useQuery({
+    queryKey: ["admin-quota"],
+    queryFn: () => quotaApi.get(),
+    staleTime: 30_000,
+  });
+
   const setShortcut = (s: "7" | "30" | "90" | "this" | "last") => {
     const today = new Date();
     if (s === "7") { setFrom(subDays(today, 7)); setTo(today); }
@@ -93,6 +99,7 @@ function AdminDashboard() {
 
   return (
     <div className="space-y-6">
+      {quotaQuery.data && <QuotaCard quota={quotaQuery.data} />}
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard Executivo</h1>

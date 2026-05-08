@@ -19,6 +19,7 @@ import { Route as TriagemSessionIdRouteImport } from './routes/triagem.$sessionI
 import { Route as AdminUnidadesRouteImport } from './routes/admin.unidades'
 import { Route as AdminProfissionaisRouteImport } from './routes/admin.profissionais'
 import { Route as AdminEspecialidadesRouteImport } from './routes/admin.especialidades'
+import { Route as AdminConhecimentoRouteImport } from './routes/admin.conhecimento'
 import { Route as AdminProfissionaisIdHorariosRouteImport } from './routes/admin.profissionais.$id.horarios'
 
 const TriagemRoute = TriagemRouteImport.update({
@@ -71,6 +72,11 @@ const AdminEspecialidadesRoute = AdminEspecialidadesRouteImport.update({
   path: '/especialidades',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminConhecimentoRoute = AdminConhecimentoRouteImport.update({
+  id: '/conhecimento',
+  path: '/conhecimento',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminProfissionaisIdHorariosRoute =
   AdminProfissionaisIdHorariosRouteImport.update({
     id: '/$id/horarios',
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/triagem': typeof TriagemRouteWithChildren
+  '/admin/conhecimento': typeof AdminConhecimentoRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/unidades': typeof AdminUnidadesRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/triagem': typeof TriagemRouteWithChildren
+  '/admin/conhecimento': typeof AdminConhecimentoRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/unidades': typeof AdminUnidadesRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/triagem': typeof TriagemRouteWithChildren
+  '/admin/conhecimento': typeof AdminConhecimentoRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/unidades': typeof AdminUnidadesRoute
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/triagem'
+    | '/admin/conhecimento'
     | '/admin/especialidades'
     | '/admin/profissionais'
     | '/admin/unidades'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/triagem'
+    | '/admin/conhecimento'
     | '/admin/especialidades'
     | '/admin/profissionais'
     | '/admin/unidades'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/triagem'
+    | '/admin/conhecimento'
     | '/admin/especialidades'
     | '/admin/profissionais'
     | '/admin/unidades'
@@ -238,6 +250,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEspecialidadesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/conhecimento': {
+      id: '/admin/conhecimento'
+      path: '/conhecimento'
+      fullPath: '/admin/conhecimento'
+      preLoaderRoute: typeof AdminConhecimentoRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/profissionais/$id/horarios': {
       id: '/admin/profissionais/$id/horarios'
       path: '/$id/horarios'
@@ -260,6 +279,7 @@ const AdminProfissionaisRouteWithChildren =
   AdminProfissionaisRoute._addFileChildren(AdminProfissionaisRouteChildren)
 
 interface AdminRouteChildren {
+  AdminConhecimentoRoute: typeof AdminConhecimentoRoute
   AdminEspecialidadesRoute: typeof AdminEspecialidadesRoute
   AdminProfissionaisRoute: typeof AdminProfissionaisRouteWithChildren
   AdminUnidadesRoute: typeof AdminUnidadesRoute
@@ -267,6 +287,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminConhecimentoRoute: AdminConhecimentoRoute,
   AdminEspecialidadesRoute: AdminEspecialidadesRoute,
   AdminProfissionaisRoute: AdminProfissionaisRouteWithChildren,
   AdminUnidadesRoute: AdminUnidadesRoute,
@@ -296,3 +317,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Gift } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -11,14 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { billingApi, type Plan } from "@/lib/api";
-
-type PlanId = "trial" | "basic" | "pro";
+import { billingApi, referralApi, type Plan } from "@/lib/api";
 
 export const Route = createFileRoute("/cadastro")({
-  validateSearch: (search: Record<string, unknown>): { plan: PlanId } => {
-    const p = (search.plan as string) ?? "trial";
-    return { plan: (["trial", "basic", "pro"].includes(p) ? p : "trial") as PlanId };
+  validateSearch: (search: Record<string, unknown>): { plan: string; ref?: string } => {
+    const p = typeof search.plan === "string" && search.plan ? search.plan : "trial";
+    const ref = typeof search.ref === "string" && search.ref ? search.ref : undefined;
+    return { plan: p, ref };
   },
   head: () => ({
     meta: [
@@ -33,7 +32,7 @@ const fmtBRL = (v: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v / 100);
 
 function SignupPage() {
-  const { plan: planId } = Route.useSearch();
+  const { plan: planId, ref: referralCode } = Route.useSearch();
   const navigate = useNavigate();
 
   const plansQ = useQuery({
@@ -42,6 +41,14 @@ function SignupPage() {
     staleTime: 5 * 60_000,
   });
   const selected: Plan | undefined = plansQ.data?.plans.find((p) => p.id === planId);
+
+  const refQ = useQuery({
+    queryKey: ["billing", "ref", referralCode],
+    queryFn: () => referralApi.lookupCode(referralCode!),
+    enabled: !!referralCode,
+    staleTime: 60_000,
+    retry: false,
+  });
 
   const [clinicName, setClinicName] = useState("");
   const [email, setEmail] = useState("");
@@ -57,6 +64,7 @@ function SignupPage() {
         admin_password: password,
         plan_id: planId,
         origin_url: window.location.origin,
+        referral_code: referralCode,
       }),
     onSuccess: (resp) => {
       if (resp.next_action === "checkout" && resp.checkout_url) {
@@ -91,6 +99,20 @@ function SignupPage() {
       <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10 md:py-14">
         <div className="grid gap-6 md:grid-cols-[1fr_320px]">
           <Card className="p-6 md:p-8">
+            {referralCode && refQ.data?.valid && (
+              <div className="mb-4 flex items-start gap-2 rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">
+                <Gift className="mt-0.5 h-4 w-4 shrink-0" />
+                <p>
+                  🎁 Você foi indicado por <strong>{refQ.data.inviter_name ?? "uma clínica parceira"}</strong> e ganhará{" "}
+                  <strong>+{refQ.data.bonus_per_referral ?? 0} triagens bônus</strong> quando se tornar cliente pagante!
+                </p>
+              </div>
+            )}
+            {referralCode && refQ.data && !refQ.data.valid && (
+              <div className="mb-4 rounded-md border border-border bg-muted p-3 text-xs text-muted-foreground">
+                Este link de indicação não está mais disponível.
+              </div>
+            )}
             <h1 className="text-2xl font-bold tracking-tight">Criar sua conta</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Em poucos passos sua clínica começa a usar o STOMNI.

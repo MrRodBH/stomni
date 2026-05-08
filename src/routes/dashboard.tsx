@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { Activity, AlarmClock, Stethoscope, TrendingUp } from "lucide-react";
 import { analyticsApi, type AnalyticsMetrics } from "@/lib/api";
+import { RequireAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -26,6 +27,14 @@ export const Route = createFileRoute("/dashboard")({
 type Range = "hour" | "day" | "month" | "custom";
 
 function DashboardPage() {
+  return (
+    <RequireAuth>
+      <DashboardContent />
+    </RequireAuth>
+  );
+}
+
+function DashboardContent() {
   const [range, setRange] = useState<Range>("day");
   const [metrics, setMetrics] = useState<AnalyticsMetrics | null>(null);
   const [loading, setLoading] = useState(true);

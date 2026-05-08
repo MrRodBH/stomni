@@ -296,6 +296,50 @@ export const analyticsApi = {
   },
 };
 
+// ===== Advanced Analytics (Fase 4.5) =====
+export interface AdvancedAnalytics {
+  range: { from: string; to: string; days: number };
+  totals: {
+    triages: number;
+    sessions_started: number;
+    sessions_confirmed: number;
+    completed: number;
+  };
+  kpis: {
+    conversion_rate_pct: number;
+    emergency_rate_pct: number;
+    avg_urgency_score: number;
+  };
+  heatmap_dow_hour: number[][];
+  urgency_timeline: { date: string; low: number; medium: number; high: number }[];
+  specialty_trend: {
+    specialties: string[];
+    data: { date: string; [specialty: string]: string | number }[];
+  };
+  funnel: { stage: string; value: number }[];
+  csat_histogram: { [score: string]: number };
+}
+
+export const advancedAnalyticsApi = {
+  get: async (from?: string, to?: string): Promise<AdvancedAnalytics> => {
+    const params = new URLSearchParams();
+    if (from) params.set("from", from);
+    if (to) params.set("to", to);
+    const qs = params.toString();
+    const { data } = await api.get<AdvancedAnalytics>(
+      `/analytics/advanced${qs ? "?" + qs : ""}`,
+    );
+    return data;
+  },
+  exportCsvUrl: (from?: string, to?: string): string => {
+    const params = new URLSearchParams();
+    if (from) params.set("from", from);
+    if (to) params.set("to", to);
+    params.set("format", "csv");
+    return `${api.defaults.baseURL}/admin/triages/export?${params.toString()}`;
+  },
+};
+
 export const adminApi = {
   list: async (): Promise<KnowledgeDocument[]> => {
     try {

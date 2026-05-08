@@ -139,6 +139,46 @@ export const clinicsApi = {
 };
 
 export const triageApi = {
+  // ===== Multi-turn triage sessions (RAG) =====
+  createSession: async (
+    initialMessage?: string,
+    tenant: string = "ten_stomni",
+  ): Promise<TriageSession> => {
+    const { data } = await api.post<TriageSession>(
+      `/triage/sessions?tenant=${encodeURIComponent(tenant)}`,
+      { initial_message: initialMessage, use_rag: true },
+    );
+    return data;
+  },
+  getSession: async (id: string): Promise<TriageSession> => {
+    const { data } = await api.get<TriageSession>(`/triage/sessions/${id}`);
+    return data;
+  },
+  sendMessage: async (id: string, message: string): Promise<TriageSession> => {
+    const { data } = await api.post<TriageSession>(
+      `/triage/sessions/${id}/messages`,
+      { message, use_rag: true },
+    );
+    return data;
+  },
+  finalize: async (
+    id: string,
+    payload: {
+      patient: PatientInfo;
+      attendance_type: AttendanceType;
+      date: string;
+      time: string;
+      files?: { name: string; size: number }[];
+    },
+  ): Promise<TriageProcessResponse> => {
+    const { data } = await api.post<TriageProcessResponse>(
+      `/triage/sessions/${id}/finalize`,
+      payload,
+    );
+    return data;
+  },
+
+  // ===== Legacy single-shot triage (kept for compat) =====
   process: async (payload: TriageProcessRequest): Promise<TriageProcessResponse> => {
     try {
       const { data } = await api.post<TriageProcessResponse>("/triage/process", payload);
@@ -168,6 +208,82 @@ export const triageApi = {
       urgency: i === 1 || i === 8 ? "high" : i === 4 ? "medium" : undefined,
     }));
   },
+};
+
+// ===== Triage sessions (multi-turn) =====
+export type TriageSessionState =
+  | "gathering"
+  | "assessment"
+  | "scheduling"
+  | "confirmed";
+
+export interface TriageMessage {
+  role: "user" | "assistant";
+  text: string;
+  ts: string;
+}
+
+export interface TriageExtracted {
+  main_complaint: string | null;
+  pain_intensity: number | null;
+  duration: string | null;
+  associated_symptoms: string[];
+}
+
+export interface TriageSession {
+  id: string;
+  state: TriageSessionState;
+  messages: TriageMessage[];
+  extracted: TriageExtracted;
+  urgency_score: number | null;
+  specialty: string | null;
+  is_emergency: boolean;
+  patient_hint: Record<string, string>;
+  linked_triage_id: string | null;
+  created_at: string;
+  updated_at: string;
+  turn_count: number;
+  share_url: string;
+}
+
+// ===== Knowledge Base (admin) =====
+export interface KnowledgeDoc {
+  id: string;
+  filename: string;
+  size: number;
+  status: "indexed" | "empty" | "error" | "ready" | "processing";
+  uploaded_at: string;
+  chunks_indexed: number;
+  indexed_status: string | null;
+  has_file: boolean;
+}
+
+export const knowledgeApi = {
+  list: async (): Promise<KnowledgeDoc[]> => {
+    const { data } = await api.get<KnowledgeDoc[]>("/admin/knowledge");
+    return Array.isArray(data) ? data : [];
+  },
+  stats: async (): Promise<{ total_chunks: number; total_documents: number; collection: string }> => {
+    const { data } = await api.get<{ total_chunks: number; total_documents: number; collection: string }>(
+      "/admin/knowledge/stats",
+    );
+    return data;
+  },
+  upload: async (file: File): Promise<KnowledgeDoc> => {
+    const fd = new FormData();
+    fd.append("file", file);
+    const { data } = await api.post<KnowledgeDoc>("/admin/knowledge/upload", fd, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return data;
+  },
+  remove: async (id: string): Promise<{ deleted: string; chunks_removed: number }> => {
+    const { data } = await api.delete<{ deleted: string; chunks_removed: number }>(
+      `/admin/knowledge/${id}`,
+    );
+    return data;
+  },
+  downloadUrl: (id: string): string => `${api.defaults.baseURL}/admin/knowledge/${id}/download`,
 };
 
 export const analyticsApi = {

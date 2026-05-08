@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { SiteHeader } from "@/components/site-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -71,9 +70,7 @@ function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
-      <div className="mx-auto max-w-6xl px-6 py-10 space-y-8">
+    <div className="space-y-8">
         <header>
           <h1 className="text-3xl font-bold tracking-tight">Admin</h1>
           <p className="text-sm text-muted-foreground">
@@ -230,7 +227,6 @@ function AdminPage() {
             )}
           </Card>
         </section>
-      </div>
     </div>
   );
 }

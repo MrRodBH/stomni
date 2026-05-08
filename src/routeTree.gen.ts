@@ -16,6 +16,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminUnidadesRouteImport } from './routes/admin.unidades'
+import { Route as AdminProfissionaisRouteImport } from './routes/admin.profissionais'
 import { Route as AdminEspecialidadesRouteImport } from './routes/admin.especialidades'
 
 const TriagemRoute = TriagemRouteImport.update({
@@ -53,6 +54,11 @@ const AdminUnidadesRoute = AdminUnidadesRouteImport.update({
   path: '/unidades',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminProfissionaisRoute = AdminProfissionaisRouteImport.update({
+  id: '/profissionais',
+  path: '/profissionais',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminEspecialidadesRoute = AdminEspecialidadesRouteImport.update({
   id: '/especialidades',
   path: '/especialidades',
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/triagem': typeof TriagemRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
+  '/admin/profissionais': typeof AdminProfissionaisRoute
   '/admin/unidades': typeof AdminUnidadesRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/triagem': typeof TriagemRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
+  '/admin/profissionais': typeof AdminProfissionaisRoute
   '/admin/unidades': typeof AdminUnidadesRoute
   '/admin': typeof AdminIndexRoute
 }
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/triagem': typeof TriagemRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
+  '/admin/profissionais': typeof AdminProfissionaisRoute
   '/admin/unidades': typeof AdminUnidadesRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/triagem'
     | '/admin/especialidades'
+    | '/admin/profissionais'
     | '/admin/unidades'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/triagem'
     | '/admin/especialidades'
+    | '/admin/profissionais'
     | '/admin/unidades'
     | '/admin'
   id:
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/triagem'
     | '/admin/especialidades'
+    | '/admin/profissionais'
     | '/admin/unidades'
     | '/admin/'
   fileRoutesById: FileRoutesById
@@ -180,6 +192,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUnidadesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/profissionais': {
+      id: '/admin/profissionais'
+      path: '/profissionais'
+      fullPath: '/admin/profissionais'
+      preLoaderRoute: typeof AdminProfissionaisRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/especialidades': {
       id: '/admin/especialidades'
       path: '/especialidades'
@@ -192,12 +211,14 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminEspecialidadesRoute: typeof AdminEspecialidadesRoute
+  AdminProfissionaisRoute: typeof AdminProfissionaisRoute
   AdminUnidadesRoute: typeof AdminUnidadesRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminEspecialidadesRoute: AdminEspecialidadesRoute,
+  AdminProfissionaisRoute: AdminProfissionaisRoute,
   AdminUnidadesRoute: AdminUnidadesRoute,
   AdminIndexRoute: AdminIndexRoute,
 }

@@ -803,3 +803,20 @@ export const abandonmentApi = {
     return data;
   },
 };
+
+// ===== Quota (Fase 5.5) =====
+export interface QuotaStatus {
+  plan: string | null;
+  status: string | null;
+  limits: { max_triages_per_month: number; max_units: number };
+  usage: { triages_this_month: number; units: number };
+  remaining: { triages_this_month: number; units: number };
+  near_limit: { triages_this_month: boolean; units: boolean };
+}
+
+export const quotaApi = {
+  get: async (): Promise<QuotaStatus> => {
+    const { data } = await api.get<QuotaStatus>("/admin/quota");
+    return data;
+  },
+};

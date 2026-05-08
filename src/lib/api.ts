@@ -207,6 +207,17 @@ export const triageApi = {
     return data;
   },
 
+  confirmSuggestion: async (
+    id: string,
+    patient: { full_name: string; whatsapp: string; clinic_id: string; consent: boolean },
+  ): Promise<TriageProcessResponse> => {
+    const { data } = await api.post<TriageProcessResponse>(
+      `/triage/sessions/${id}/confirm-suggestion`,
+      patient,
+    );
+    return data;
+  },
+
   // ===== Legacy single-shot triage (kept for compat) =====
   process: async (payload: TriageProcessRequest): Promise<TriageProcessResponse> => {
     try {
@@ -273,6 +284,20 @@ export interface TriageSession {
   updated_at: string;
   turn_count: number;
   share_url: string;
+  suggested_booking?: SuggestedBooking | null;
+}
+
+export interface SuggestedBooking {
+  professional_id: string;
+  professional_name: string;
+  professional_title: string;
+  specialty_id: string;
+  specialty_name: string;
+  clinic_id: string;
+  clinic_name: string;
+  date: string; // YYYY-MM-DD
+  time: string; // HH:MM
+  duration_min: number;
 }
 
 // ===== Knowledge Base (admin) =====
@@ -298,12 +323,15 @@ export const knowledgeApi = {
     );
     return data;
   },
-  upload: async (file: File): Promise<KnowledgeDoc> => {
+  upload: async (file: File, clean_noise: boolean = true): Promise<KnowledgeDoc> => {
     const fd = new FormData();
     fd.append("file", file);
-    const { data } = await api.post<KnowledgeDoc>("/admin/knowledge/upload", fd, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const params = new URLSearchParams({ clean_noise: String(clean_noise) });
+    const { data } = await api.post<KnowledgeDoc>(
+      `/admin/knowledge/upload?${params}`,
+      fd,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
     return data;
   },
   remove: async (id: string): Promise<{ deleted: string; chunks_removed: number }> => {

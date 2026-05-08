@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import {
   AlertTriangle, ArrowRight, Calendar as CalendarIcon, Check, Loader2,
   MessageSquare, Send, Share2, ShieldCheck, Sparkles,
 } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,7 +23,7 @@ import {
 import { SiteHeader } from "@/components/site-header";
 import {
   triageApi, clinicsApi,
-  type TriageSession, type Clinic, type AppointmentSlot,
+  type TriageSession, type Clinic, type AppointmentSlot, type SuggestedBooking,
   type AttendanceType,
 } from "@/lib/api";
 import { maskWhatsapp } from "@/lib/patient-session";
@@ -45,6 +45,7 @@ export function TriageChat({ sessionId }: TriageChatProps) {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [step, setStep] = useState<Step>("chat");
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Resume flow
@@ -198,6 +199,26 @@ export function TriageChat({ sessionId }: TriageChatProps) {
               <AssessmentCard session={session} onContinue={() => setStep("schedule")} />
             )}
 
+            {session?.state === "assessment" && session.suggested_booking && (
+              <SuggestedBookingCard
+                booking={session.suggested_booking}
+                onConfirm={() => setShowConfirmDialog(true)}
+                onChooseOther={() => setStep("schedule")}
+              />
+            )}
+
+            {session && session.suggested_booking && (
+              <ConfirmSuggestionDialog
+                open={showConfirmDialog}
+                onOpenChange={setShowConfirmDialog}
+                session={session}
+                onConfirmed={(s: TriageSession) => {
+                  setSession(s);
+                  setShowConfirmDialog(false);
+                }}
+              />
+            )}
+
             {session?.state === "confirmed" && (
               <Card className="mt-4 p-5 text-center">
                 <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-accent">
@@ -227,6 +248,179 @@ export function TriageChat({ sessionId }: TriageChatProps) {
         )}
       </div>
     </div>
+  );
+}
+
+function SuggestedBookingCard({
+  booking, onConfirm, onChooseOther,
+}: { booking: SuggestedBooking; onConfirm: () => void; onChooseOther: () => void }) {
+  return (
+    <Card className="mt-4 border-2 border-primary/40 bg-primary/5">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <CalendarIcon className="size-5 text-primary" />
+          Encaminhamento sugerido
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div>
+            <span className="text-muted-foreground">Profissional</span>
+            <p className="font-medium">
+              {booking.professional_title} {booking.professional_name}
+            </p>
+          </div>
+          <div>
+            <span className="text-muted-foreground">Especialidade</span>
+            <p className="font-medium">{booking.specialty_name}</p>
+          </div>
+          <div>
+            <span className="text-muted-foreground">Data e horário</span>
+            <p className="font-medium">
+              {format(parseISO(booking.date), "dd/MM/yyyy")} às {booking.time}
+            </p>
+          </div>
+          <div>
+            <span className="text-muted-foreground">Unidade</span>
+            <p className="font-medium">{booking.clinic_name}</p>
+          </div>
+        </div>
+        <div className="flex flex-col gap-2 pt-2 sm:flex-row">
+          <Button className="flex-1" onClick={onConfirm}>
+            <Check className="mr-1 h-4 w-4" /> Confirmar este horário
+          </Button>
+          <Button variant="outline" className="flex-1" onClick={onChooseOther}>
+            <CalendarIcon className="mr-1 h-4 w-4" /> Escolher outra data
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ConfirmSuggestionDialog({
+  open, onOpenChange, session, onConfirmed,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  session: TriageSession;
+  onConfirmed: (s: TriageSession) => void;
+}) {
+  const [name, setName] = useState(session.patient_hint?.full_name ?? "");
+  const [phone, setPhone] = useState(session.patient_hint?.whatsapp ?? "");
+  const [consent, setConsent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState<{ protocol: string; classification: string; message: string } | null>(null);
+
+  const valid =
+    name.trim().length >= 3 &&
+    /^\(\d{2}\) \d{5}-\d{4}$/.test(phone) &&
+    consent;
+
+  const submit = async () => {
+    if (!valid) return;
+    setSubmitting(true);
+    try {
+      const res = await triageApi.confirmSuggestion(session.id, {
+        full_name: name.trim(),
+        whatsapp: phone,
+        clinic_id: session.suggested_booking?.clinic_id ?? "",
+        consent: true,
+      });
+      setDone(res);
+    } catch {
+      toast.error("Não foi possível confirmar o agendamento.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const finish = () => {
+    if (done) {
+      onConfirmed({ ...session, state: "confirmed", linked_triage_id: done.protocol });
+    }
+    setDone(null);
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        if (!o && done) finish();
+        else onOpenChange(o);
+      }}
+    >
+      <DialogContent>
+        {done ? (
+          <>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Check className="h-5 w-5 text-primary" /> Agendamento confirmado
+              </DialogTitle>
+              <DialogDescription>{done.message}</DialogDescription>
+            </DialogHeader>
+            <div className="rounded-md bg-muted p-3 text-center">
+              <p className="text-xs uppercase text-muted-foreground">Protocolo</p>
+              <p className="font-mono text-lg font-semibold">{done.protocol}</p>
+            </div>
+            <DialogFooter>
+              <Button onClick={finish}>Concluir</Button>
+            </DialogFooter>
+          </>
+        ) : (
+          <>
+            <DialogHeader>
+              <DialogTitle>Confirmar agendamento</DialogTitle>
+              <DialogDescription>
+                Informe seus dados para confirmar o horário sugerido.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="cf-name">Nome completo</Label>
+                <Input
+                  id="cf-name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Maria Silva"
+                />
+              </div>
+              <div>
+                <Label htmlFor="cf-phone">WhatsApp</Label>
+                <Input
+                  id="cf-phone"
+                  value={phone}
+                  onChange={(e) => setPhone(maskWhatsapp(e.target.value))}
+                  placeholder="(11) 99999-9999"
+                  inputMode="tel"
+                />
+              </div>
+              <label className="flex items-start gap-2 rounded-md border border-border bg-muted/30 p-3 text-sm">
+                <Checkbox
+                  checked={consent}
+                  onCheckedChange={(v) => setConsent(v === true)}
+                  className="mt-0.5"
+                />
+                <span className="flex-1">
+                  <ShieldCheck className="mr-1 inline h-4 w-4 text-primary" />
+                  Concordo com a Política de Privacidade e o tratamento dos meus dados
+                  conforme a LGPD.
+                </span>
+              </label>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => onOpenChange(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={submit} disabled={!valid || submitting}>
+                {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Confirmar agendamento
+              </Button>
+            </DialogFooter>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -351,10 +545,14 @@ function ScheduleStep({
   const [clinics, setClinics] = useState<Clinic[]>([]);
   const [name, setName] = useState(session.patient_hint?.full_name ?? "");
   const [phone, setPhone] = useState(session.patient_hint?.whatsapp ?? "");
-  const [clinicId, setClinicId] = useState(session.patient_hint?.clinic_id ?? "");
+  const [clinicId, setClinicId] = useState(
+    session.suggested_booking?.clinic_id ?? session.patient_hint?.clinic_id ?? "",
+  );
   const [consent, setConsent] = useState(false);
   const [type, setType] = useState<AttendanceType>(session.is_emergency ? "emergencia" : "consulta");
-  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [date, setDate] = useState<Date | undefined>(
+    session.suggested_booking?.date ? parseISO(session.suggested_booking.date) : undefined,
+  );
   const [slots, setSlots] = useState<AppointmentSlot[] | null>(null);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [time, setTime] = useState("");

@@ -17,9 +17,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as TriagemSessionIdRouteImport } from './routes/triagem.$sessionId'
 import { Route as AdminUnidadesRouteImport } from './routes/admin.unidades'
+import { Route as AdminTriagensRouteImport } from './routes/admin.triagens'
 import { Route as AdminProfissionaisRouteImport } from './routes/admin.profissionais'
 import { Route as AdminEspecialidadesRouteImport } from './routes/admin.especialidades'
 import { Route as AdminConhecimentoRouteImport } from './routes/admin.conhecimento'
+import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
 import { Route as AdminProfissionaisIdHorariosRouteImport } from './routes/admin.profissionais.$id.horarios'
 
 const TriagemRoute = TriagemRouteImport.update({
@@ -62,6 +64,11 @@ const AdminUnidadesRoute = AdminUnidadesRouteImport.update({
   path: '/unidades',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminTriagensRoute = AdminTriagensRouteImport.update({
+  id: '/triagens',
+  path: '/triagens',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminProfissionaisRoute = AdminProfissionaisRouteImport.update({
   id: '/profissionais',
   path: '/profissionais',
@@ -77,6 +84,11 @@ const AdminConhecimentoRoute = AdminConhecimentoRouteImport.update({
   path: '/conhecimento',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminProfissionaisIdHorariosRoute =
   AdminProfissionaisIdHorariosRouteImport.update({
     id: '/$id/horarios',
@@ -90,9 +102,11 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/triagem': typeof TriagemRouteWithChildren
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/conhecimento': typeof AdminConhecimentoRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
+  '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -103,9 +117,11 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/triagem': typeof TriagemRouteWithChildren
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/conhecimento': typeof AdminConhecimentoRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
+  '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin': typeof AdminIndexRoute
@@ -118,9 +134,11 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/triagem': typeof TriagemRouteWithChildren
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/conhecimento': typeof AdminConhecimentoRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
+  '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -134,9 +152,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/triagem'
+    | '/admin/configuracoes'
     | '/admin/conhecimento'
     | '/admin/especialidades'
     | '/admin/profissionais'
+    | '/admin/triagens'
     | '/admin/unidades'
     | '/triagem/$sessionId'
     | '/admin/'
@@ -147,9 +167,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/triagem'
+    | '/admin/configuracoes'
     | '/admin/conhecimento'
     | '/admin/especialidades'
     | '/admin/profissionais'
+    | '/admin/triagens'
     | '/admin/unidades'
     | '/triagem/$sessionId'
     | '/admin'
@@ -161,9 +183,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/triagem'
+    | '/admin/configuracoes'
     | '/admin/conhecimento'
     | '/admin/especialidades'
     | '/admin/profissionais'
+    | '/admin/triagens'
     | '/admin/unidades'
     | '/triagem/$sessionId'
     | '/admin/'
@@ -236,6 +260,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUnidadesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/triagens': {
+      id: '/admin/triagens'
+      path: '/triagens'
+      fullPath: '/admin/triagens'
+      preLoaderRoute: typeof AdminTriagensRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/profissionais': {
       id: '/admin/profissionais'
       path: '/profissionais'
@@ -255,6 +286,13 @@ declare module '@tanstack/react-router' {
       path: '/conhecimento'
       fullPath: '/admin/conhecimento'
       preLoaderRoute: typeof AdminConhecimentoRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/configuracoes': {
+      id: '/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AdminConfiguracoesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/profissionais/$id/horarios': {
@@ -279,17 +317,21 @@ const AdminProfissionaisRouteWithChildren =
   AdminProfissionaisRoute._addFileChildren(AdminProfissionaisRouteChildren)
 
 interface AdminRouteChildren {
+  AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
   AdminConhecimentoRoute: typeof AdminConhecimentoRoute
   AdminEspecialidadesRoute: typeof AdminEspecialidadesRoute
   AdminProfissionaisRoute: typeof AdminProfissionaisRouteWithChildren
+  AdminTriagensRoute: typeof AdminTriagensRoute
   AdminUnidadesRoute: typeof AdminUnidadesRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminConfiguracoesRoute: AdminConfiguracoesRoute,
   AdminConhecimentoRoute: AdminConhecimentoRoute,
   AdminEspecialidadesRoute: AdminEspecialidadesRoute,
   AdminProfissionaisRoute: AdminProfissionaisRouteWithChildren,
+  AdminTriagensRoute: AdminTriagensRoute,
   AdminUnidadesRoute: AdminUnidadesRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
@@ -317,3 +359,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

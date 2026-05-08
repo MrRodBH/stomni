@@ -340,3 +340,151 @@ export const uploadsApi = {
     });
   },
 };
+
+// ===== Auth =====
+export type UserRole = "reception" | "admin" | "super_admin" | "tenant_admin" | string;
+export interface AuthUser {
+  id: string;
+  email: string;
+  name?: string;
+  role: UserRole;
+  tenant_id?: string;
+}
+export const authApi = {
+  me: async (): Promise<AuthUser> => {
+    const { data } = await api.get<AuthUser>("/auth/me");
+    return data;
+  },
+  login: async (email: string, password: string): Promise<AuthUser> => {
+    const { data } = await api.post<AuthUser>("/auth/login", { email, password });
+    return data;
+  },
+  logout: async (): Promise<void> => {
+    await api.post("/auth/logout");
+  },
+};
+
+// ===== Admin: Specialties =====
+export interface Specialty {
+  id: string;
+  code: string;
+  name: string;
+  default_duration_min: number;
+  default_price: number;
+  color: string;
+  is_active?: boolean;
+}
+export type SpecialtyInput = Omit<Specialty, "id" | "is_active">;
+export const specialtiesApi = {
+  list: async (): Promise<Specialty[]> => {
+    const { data } = await api.get<Specialty[]>("/admin/specialties");
+    return Array.isArray(data) ? data : [];
+  },
+  create: async (payload: SpecialtyInput): Promise<Specialty> => {
+    const { data } = await api.post<Specialty>("/admin/specialties", payload);
+    return data;
+  },
+  update: async (id: string, payload: Partial<SpecialtyInput>): Promise<Specialty> => {
+    const { data } = await api.patch<Specialty>(`/admin/specialties/${id}`, payload);
+    return data;
+  },
+  remove: async (id: string): Promise<void> => {
+    await api.delete(`/admin/specialties/${id}`);
+  },
+};
+
+// ===== Admin: Units =====
+export interface Unit {
+  id: string;
+  name: string;
+  city?: string;
+  address?: string;
+  phone?: string;
+  is_active: boolean;
+}
+export type UnitInput = Omit<Unit, "id">;
+export const unitsApi = {
+  list: async (): Promise<Unit[]> => {
+    const { data } = await api.get<Unit[]>("/admin/units");
+    return Array.isArray(data) ? data : [];
+  },
+  create: async (payload: UnitInput): Promise<Unit> => {
+    const { data } = await api.post<Unit>("/admin/units", payload);
+    return data;
+  },
+  update: async (id: string, payload: Partial<UnitInput>): Promise<Unit> => {
+    const { data } = await api.patch<Unit>(`/admin/units/${id}`, payload);
+    return data;
+  },
+  remove: async (id: string): Promise<void> => {
+    await api.delete(`/admin/units/${id}`);
+  },
+};
+
+// ===== Admin: Professionals =====
+export interface Professional {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  photo_url?: string;
+  registration_number?: string;
+  bio?: string;
+  specialty_ids: string[];
+  clinic_ids: string[];
+}
+export type ProfessionalInput = Omit<Professional, "id">;
+export const professionalsApi = {
+  list: async (): Promise<Professional[]> => {
+    const { data } = await api.get<Professional[]>("/admin/professionals");
+    return Array.isArray(data) ? data : [];
+  },
+  get: async (id: string): Promise<Professional> => {
+    const { data } = await api.get<Professional>(`/admin/professionals/${id}`);
+    return data;
+  },
+  create: async (payload: ProfessionalInput): Promise<Professional> => {
+    const { data } = await api.post<Professional>("/admin/professionals", payload);
+    return data;
+  },
+  update: async (id: string, payload: Partial<ProfessionalInput>): Promise<Professional> => {
+    const { data } = await api.patch<Professional>(`/admin/professionals/${id}`, payload);
+    return data;
+  },
+  remove: async (id: string): Promise<void> => {
+    await api.delete(`/admin/professionals/${id}`);
+  },
+};
+
+// ===== Working hours =====
+export type Weekday =
+  | "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
+export interface TimeRange { start: string; end: string }
+export interface ScheduleOverride {
+  date: string;
+  type: "off" | "custom";
+  reason?: string;
+  ranges?: TimeRange[];
+}
+export interface WorkingHours {
+  professional_id: string;
+  clinic_id: string;
+  weekly: Record<Weekday, TimeRange[]>;
+  overrides: ScheduleOverride[];
+}
+export const workingHoursApi = {
+  get: async (professionalId: string, clinicId: string): Promise<WorkingHours> => {
+    const { data } = await api.get<WorkingHours>(
+      `/admin/professionals/${professionalId}/working-hours`,
+      { params: { clinic_id: clinicId } },
+    );
+    return data;
+  },
+  save: async (professionalId: string, payload: WorkingHours): Promise<WorkingHours> => {
+    const { data } = await api.put<WorkingHours>(
+      `/admin/professionals/${professionalId}/working-hours`,
+      payload,
+    );
+    return data;
+  },
+};

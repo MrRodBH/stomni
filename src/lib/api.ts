@@ -607,3 +607,57 @@ export const workingHoursApi = {
     return data;
   },
 };
+
+// ===== Tenant Settings (Fase 4) =====
+export interface TenantSettings {
+  timezone?: string;
+  language?: string;
+  branding?: { logo_url?: string | null; primary_color?: string | null };
+  triage_prompt_override?: string | null;
+  weekly_insights_enabled?: boolean;
+  weekly_insights_recipient?: string | null;
+}
+
+export const tenantSettingsApi = {
+  get: async (): Promise<TenantSettings> => {
+    const { data } = await api.get<TenantSettings>("/admin/tenant-settings");
+    return data;
+  },
+  update: async (settings: TenantSettings): Promise<TenantSettings> => {
+    const { data } = await api.put<TenantSettings>("/admin/tenant-settings", settings);
+    return data;
+  },
+};
+
+// ===== Admin Triage Sessions Dashboard (Fase 4) =====
+export interface AdminTriageSessionItem {
+  id: string;
+  state: "gathering" | "assessment" | "scheduling" | "confirmed";
+  main_complaint: string | null;
+  urgency_score: number | null;
+  is_emergency: boolean;
+  specialty: string | null;
+  turn_count: number;
+  last_user_message: string | null;
+  minutes_since_start: number;
+  minutes_since_update: number;
+  created_at: string;
+  updated_at: string;
+  linked_triage_id: string | null;
+}
+
+export const adminTriageApi = {
+  list: async (states?: string[], limit = 50): Promise<AdminTriageSessionItem[]> => {
+    const params = new URLSearchParams();
+    if (states && states.length) params.set("state", states.join(","));
+    params.set("limit", String(limit));
+    const { data } = await api.get<AdminTriageSessionItem[]>(
+      `/admin/triage-sessions?${params.toString()}`,
+    );
+    return Array.isArray(data) ? data : [];
+  },
+  getDetail: async (id: string): Promise<TriageSession> => {
+    const { data } = await api.get<TriageSession>(`/admin/triage-sessions/${id}`);
+    return data;
+  },
+};

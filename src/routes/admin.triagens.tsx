@@ -133,6 +133,7 @@ function TriagensPage() {
                 <tr>
                   <th className="px-3 py-2">Status</th>
                   <th className="px-3 py-2">Queixa principal</th>
+                  <th className="px-3 py-2"></th>
                   <th className="px-3 py-2">Urgência</th>
                   <th className="px-3 py-2">Especialidade</th>
                   <th className="px-3 py-2">Estado</th>

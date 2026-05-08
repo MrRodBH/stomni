@@ -48,7 +48,7 @@ function AdminShell() {
               return (
                 <Link
                   key={item.to}
-                  to={item.to}
+                  to={item.to as any}
                   className={
                     "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition " +
                     (active

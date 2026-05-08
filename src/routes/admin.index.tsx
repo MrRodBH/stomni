@@ -580,3 +580,65 @@ function MiniStat({
     </div>
   );
 }
+
+function QuotaCard({ quota }: { quota: QuotaStatus }) {
+  const fmtLimit = (n: number) => (n === -1 ? "Ilimitado" : n.toLocaleString("pt-BR"));
+  const pct = (used: number, max: number) =>
+    max === -1 ? 0 : Math.min(100, Math.round((used / Math.max(1, max)) * 100));
+
+  const triagesPct = pct(quota.usage.triages_this_month, quota.limits.max_triages_per_month);
+  const unitsPct = pct(quota.usage.units, quota.limits.max_units);
+  const anyNear = quota.near_limit.triages_this_month || quota.near_limit.units;
+
+  const planLabel = quota.plan ? quota.plan.charAt(0).toUpperCase() + quota.plan.slice(1) : "—";
+  const statusTone =
+    quota.status === "active" ? "bg-emerald-600" :
+    quota.status === "trial" ? "bg-blue-600" :
+    quota.status === "pending_payment" ? "bg-amber-600" : "bg-muted";
+
+  return (
+    <Card className="p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Gauge className="h-4 w-4 text-muted-foreground" />
+          <h2 className="text-sm font-semibold">Uso do Plano</h2>
+          <Badge className={cn("text-white", statusTone)}>{planLabel}</Badge>
+          {quota.status && (
+            <Badge variant="outline" className="text-xs">{quota.status}</Badge>
+          )}
+        </div>
+        <Button size="sm" variant="outline" onClick={() => { window.location.href = "/precos"; }}>
+          Mudar plano
+        </Button>
+      </div>
+
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <div>
+          <div className="flex items-baseline justify-between text-xs">
+            <span className="text-muted-foreground">Triagens este mês</span>
+            <span className="font-medium">
+              {quota.usage.triages_this_month.toLocaleString("pt-BR")} / {fmtLimit(quota.limits.max_triages_per_month)}
+            </span>
+          </div>
+          <Progress value={triagesPct} className="mt-2" />
+        </div>
+        <div>
+          <div className="flex items-baseline justify-between text-xs">
+            <span className="text-muted-foreground">Unidades</span>
+            <span className="font-medium">
+              {quota.usage.units.toLocaleString("pt-BR")} / {fmtLimit(quota.limits.max_units)}
+            </span>
+          </div>
+          <Progress value={unitsPct} className="mt-2" />
+        </div>
+      </div>
+
+      {anyNear && (
+        <div className="mt-4 flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>Você está se aproximando do limite. Considere fazer upgrade.</span>
+        </div>
+      )}
+    </Card>
+  );
+}

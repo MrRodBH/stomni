@@ -18,6 +18,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as TriagemSessionIdRouteImport } from './routes/triagem.$sessionId'
+import { Route as SignupSucessoRouteImport } from './routes/signup.sucesso'
 import { Route as AdminUnidadesRouteImport } from './routes/admin.unidades'
 import { Route as AdminTriagensRouteImport } from './routes/admin.triagens'
 import { Route as AdminProfissionaisRouteImport } from './routes/admin.profissionais'
@@ -71,6 +72,11 @@ const TriagemSessionIdRoute = TriagemSessionIdRouteImport.update({
   path: '/$sessionId',
   getParentRoute: () => TriagemRoute,
 } as any)
+const SignupSucessoRoute = SignupSucessoRouteImport.update({
+  id: '/signup/sucesso',
+  path: '/signup/sucesso',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminUnidadesRoute = AdminUnidadesRouteImport.update({
   id: '/unidades',
   path: '/unidades',
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
+  '/signup/sucesso': typeof SignupSucessoRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/profissionais/$id/horarios': typeof AdminProfissionaisIdHorariosRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
+  '/signup/sucesso': typeof SignupSucessoRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin': typeof AdminIndexRoute
   '/admin/profissionais/$id/horarios': typeof AdminProfissionaisIdHorariosRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
+  '/signup/sucesso': typeof SignupSucessoRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/profissionais/$id/horarios': typeof AdminProfissionaisIdHorariosRoute
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
     | '/admin/profissionais'
     | '/admin/triagens'
     | '/admin/unidades'
+    | '/signup/sucesso'
     | '/triagem/$sessionId'
     | '/admin/'
     | '/admin/profissionais/$id/horarios'
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/admin/profissionais'
     | '/admin/triagens'
     | '/admin/unidades'
+    | '/signup/sucesso'
     | '/triagem/$sessionId'
     | '/admin'
     | '/admin/profissionais/$id/horarios'
@@ -213,6 +224,7 @@ export interface FileRouteTypes {
     | '/admin/profissionais'
     | '/admin/triagens'
     | '/admin/unidades'
+    | '/signup/sucesso'
     | '/triagem/$sessionId'
     | '/admin/'
     | '/admin/profissionais/$id/horarios'
@@ -226,6 +238,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PrecosRoute: typeof PrecosRoute
   TriagemRoute: typeof TriagemRouteWithChildren
+  SignupSucessoRoute: typeof SignupSucessoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -292,6 +305,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/triagem/$sessionId'
       preLoaderRoute: typeof TriagemSessionIdRouteImport
       parentRoute: typeof TriagemRoute
+    }
+    '/signup/sucesso': {
+      id: '/signup/sucesso'
+      path: '/signup/sucesso'
+      fullPath: '/signup/sucesso'
+      preLoaderRoute: typeof SignupSucessoRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/unidades': {
       id: '/admin/unidades'
@@ -397,6 +417,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PrecosRoute: PrecosRoute,
   TriagemRoute: TriagemRouteWithChildren,
+  SignupSucessoRoute: SignupSucessoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

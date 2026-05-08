@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Activity, Building2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   clinicLogoUrl?: string;
@@ -27,8 +28,18 @@ export function SiteHeader({ clinicLogoUrl, clinicName = "Clínica Parceira" }: 
           <NavItem to="/admin">Admin</NavItem>
         </nav>
 
-        {/* Slot do logo da clínica */}
-        <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 shadow-sm">
+        <div className="flex items-center gap-2">
+          <Link
+            to="/precos"
+            className="hidden text-xs text-muted-foreground hover:text-foreground sm:inline"
+          >
+            Para clínicas →
+          </Link>
+          <Link to="/login">
+            <Button size="sm" variant="outline">Entrar</Button>
+          </Link>
+          {/* Slot do logo da clínica */}
+          <div className="hidden items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 shadow-sm md:flex">
           {clinicLogoUrl ? (
             <img
               src={clinicLogoUrl}
@@ -41,6 +52,7 @@ export function SiteHeader({ clinicLogoUrl, clinicName = "Clínica Parceira" }: 
               <span className="text-xs font-medium text-foreground">{clinicName}</span>
             </>
           )}
+          </div>
         </div>
       </div>
       <nav className="flex items-center gap-1 overflow-x-auto border-t border-border/60 px-4 py-2 text-xs md:hidden">

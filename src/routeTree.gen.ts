@@ -10,12 +10,16 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TriagemRouteImport } from './routes/triagem'
+import { Route as PrecosRouteImport } from './routes/precos'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as TriagemSessionIdRouteImport } from './routes/triagem.$sessionId'
+import { Route as SignupSucessoRouteImport } from './routes/signup.sucesso'
+import { Route as SignupCanceladoRouteImport } from './routes/signup.cancelado'
 import { Route as AdminUnidadesRouteImport } from './routes/admin.unidades'
 import { Route as AdminTriagensRouteImport } from './routes/admin.triagens'
 import { Route as AdminProfissionaisRouteImport } from './routes/admin.profissionais'
@@ -29,6 +33,11 @@ const TriagemRoute = TriagemRouteImport.update({
   path: '/triagem',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrecosRoute = PrecosRouteImport.update({
+  id: '/precos',
+  path: '/precos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -37,6 +46,11 @@ const LoginRoute = LoginRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CadastroRoute = CadastroRouteImport.update({
+  id: '/cadastro',
+  path: '/cadastro',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -58,6 +72,16 @@ const TriagemSessionIdRoute = TriagemSessionIdRouteImport.update({
   id: '/$sessionId',
   path: '/$sessionId',
   getParentRoute: () => TriagemRoute,
+} as any)
+const SignupSucessoRoute = SignupSucessoRouteImport.update({
+  id: '/signup/sucesso',
+  path: '/signup/sucesso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupCanceladoRoute = SignupCanceladoRouteImport.update({
+  id: '/signup/cancelado',
+  path: '/signup/cancelado',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminUnidadesRoute = AdminUnidadesRouteImport.update({
   id: '/unidades',
@@ -99,8 +123,10 @@ const AdminProfissionaisIdHorariosRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/cadastro': typeof CadastroRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/precos': typeof PrecosRoute
   '/triagem': typeof TriagemRouteWithChildren
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/conhecimento': typeof AdminConhecimentoRoute
@@ -108,14 +134,18 @@ export interface FileRoutesByFullPath {
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
+  '/signup/cancelado': typeof SignupCanceladoRoute
+  '/signup/sucesso': typeof SignupSucessoRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/profissionais/$id/horarios': typeof AdminProfissionaisIdHorariosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cadastro': typeof CadastroRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/precos': typeof PrecosRoute
   '/triagem': typeof TriagemRouteWithChildren
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/conhecimento': typeof AdminConhecimentoRoute
@@ -123,6 +153,8 @@ export interface FileRoutesByTo {
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
+  '/signup/cancelado': typeof SignupCanceladoRoute
+  '/signup/sucesso': typeof SignupSucessoRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin': typeof AdminIndexRoute
   '/admin/profissionais/$id/horarios': typeof AdminProfissionaisIdHorariosRoute
@@ -131,8 +163,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/cadastro': typeof CadastroRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/precos': typeof PrecosRoute
   '/triagem': typeof TriagemRouteWithChildren
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/conhecimento': typeof AdminConhecimentoRoute
@@ -140,6 +174,8 @@ export interface FileRoutesById {
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
+  '/signup/cancelado': typeof SignupCanceladoRoute
+  '/signup/sucesso': typeof SignupSucessoRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/profissionais/$id/horarios': typeof AdminProfissionaisIdHorariosRoute
@@ -149,8 +185,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/cadastro'
     | '/dashboard'
     | '/login'
+    | '/precos'
     | '/triagem'
     | '/admin/configuracoes'
     | '/admin/conhecimento'
@@ -158,14 +196,18 @@ export interface FileRouteTypes {
     | '/admin/profissionais'
     | '/admin/triagens'
     | '/admin/unidades'
+    | '/signup/cancelado'
+    | '/signup/sucesso'
     | '/triagem/$sessionId'
     | '/admin/'
     | '/admin/profissionais/$id/horarios'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/cadastro'
     | '/dashboard'
     | '/login'
+    | '/precos'
     | '/triagem'
     | '/admin/configuracoes'
     | '/admin/conhecimento'
@@ -173,6 +215,8 @@ export interface FileRouteTypes {
     | '/admin/profissionais'
     | '/admin/triagens'
     | '/admin/unidades'
+    | '/signup/cancelado'
+    | '/signup/sucesso'
     | '/triagem/$sessionId'
     | '/admin'
     | '/admin/profissionais/$id/horarios'
@@ -180,8 +224,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/cadastro'
     | '/dashboard'
     | '/login'
+    | '/precos'
     | '/triagem'
     | '/admin/configuracoes'
     | '/admin/conhecimento'
@@ -189,6 +235,8 @@ export interface FileRouteTypes {
     | '/admin/profissionais'
     | '/admin/triagens'
     | '/admin/unidades'
+    | '/signup/cancelado'
+    | '/signup/sucesso'
     | '/triagem/$sessionId'
     | '/admin/'
     | '/admin/profissionais/$id/horarios'
@@ -197,9 +245,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  CadastroRoute: typeof CadastroRoute
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
+  PrecosRoute: typeof PrecosRoute
   TriagemRoute: typeof TriagemRouteWithChildren
+  SignupCanceladoRoute: typeof SignupCanceladoRoute
+  SignupSucessoRoute: typeof SignupSucessoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -209,6 +261,13 @@ declare module '@tanstack/react-router' {
       path: '/triagem'
       fullPath: '/triagem'
       preLoaderRoute: typeof TriagemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/precos': {
+      id: '/precos'
+      path: '/precos'
+      fullPath: '/precos'
+      preLoaderRoute: typeof PrecosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -223,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cadastro': {
+      id: '/cadastro'
+      path: '/cadastro'
+      fullPath: '/cadastro'
+      preLoaderRoute: typeof CadastroRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -252,6 +318,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/triagem/$sessionId'
       preLoaderRoute: typeof TriagemSessionIdRouteImport
       parentRoute: typeof TriagemRoute
+    }
+    '/signup/sucesso': {
+      id: '/signup/sucesso'
+      path: '/signup/sucesso'
+      fullPath: '/signup/sucesso'
+      preLoaderRoute: typeof SignupSucessoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup/cancelado': {
+      id: '/signup/cancelado'
+      path: '/signup/cancelado'
+      fullPath: '/signup/cancelado'
+      preLoaderRoute: typeof SignupCanceladoRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/unidades': {
       id: '/admin/unidades'
@@ -352,9 +432,13 @@ const TriagemRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  CadastroRoute: CadastroRoute,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
+  PrecosRoute: PrecosRoute,
   TriagemRoute: TriagemRouteWithChildren,
+  SignupCanceladoRoute: SignupCanceladoRoute,
+  SignupSucessoRoute: SignupSucessoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

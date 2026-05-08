@@ -705,3 +705,72 @@ export const adminTriageApi = {
     return data;
   },
 };
+
+// ===== Billing / Signup (Fase 5) =====
+export interface Plan {
+  id: "trial" | "basic" | "pro";
+  name: string;
+  amount: number;
+  currency: string;
+  description: string;
+  max_triages_per_month: number; // -1 = unlimited
+  max_units: number;
+}
+
+export interface SignupResponse {
+  tenant_id: string;
+  user_id: string;
+  slug: string;
+  plan: string;
+  status: "trial" | "pending_payment" | "active";
+  next_action: "login" | "checkout";
+  checkout_url?: string;
+  session_id?: string;
+}
+
+export interface CheckoutStatus {
+  session_id: string;
+  payment_status: "initiated" | "paid" | "failed" | "expired";
+  stripe_status?: string;
+  tenant_id: string;
+  tenant_status: "trial" | "pending_payment" | "active";
+}
+
+export const billingApi = {
+  listPlans: async () =>
+    (await api.get<{ plans: Plan[] }>("/billing/plans")).data,
+  signup: async (payload: {
+    clinic_name: string;
+    contact_email: string;
+    admin_password: string;
+    plan_id: "trial" | "basic" | "pro";
+    origin_url: string;
+  }) => (await api.post<SignupResponse>("/signup/tenant", payload)).data,
+  checkoutStatus: async (sessionId: string) =>
+    (await api.get<CheckoutStatus>(`/billing/checkout/status/${sessionId}`)).data,
+};
+
+// ===== Abandonment Analytics (Fase 5) =====
+export interface AbandonmentAnalytics {
+  range: { from: string; to: string };
+  total_started: number;
+  total_abandoned: number;
+  abandonment_rate_pct: number;
+  by_turn: { bucket: string; key: string; value: number }[];
+  by_state_at_abandon: { state: string; key: string; value: number }[];
+  top_abandonment_complaints: { complaint: string; count: number }[];
+  last_user_messages_sample: string[];
+}
+
+export const abandonmentApi = {
+  get: async (from?: string, to?: string): Promise<AbandonmentAnalytics> => {
+    const p = new URLSearchParams();
+    if (from) p.set("from", from);
+    if (to) p.set("to", to);
+    const qs = p.toString();
+    const { data } = await api.get<AbandonmentAnalytics>(
+      `/analytics/abandonment${qs ? "?" + qs : ""}`,
+    );
+    return data;
+  },
+};

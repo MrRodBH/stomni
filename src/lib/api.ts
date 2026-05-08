@@ -273,6 +273,20 @@ export interface TriageSession {
   updated_at: string;
   turn_count: number;
   share_url: string;
+  suggested_booking?: SuggestedBooking | null;
+}
+
+export interface SuggestedBooking {
+  professional_id: string;
+  professional_name: string;
+  professional_title: string;
+  specialty_id: string;
+  specialty_name: string;
+  clinic_id: string;
+  clinic_name: string;
+  date: string; // YYYY-MM-DD
+  time: string; // HH:MM
+  duration_min: number;
 }
 
 // ===== Knowledge Base (admin) =====

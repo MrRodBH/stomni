@@ -87,7 +87,7 @@ export function TriageChat({ sessionId }: TriageChatProps) {
       if (!session) {
         const s = await triageApi.createSession(text);
         setSession(s);
-        navigate({ to: "/triagem/$sessionId" as any, params: { sessionId: s.id } });
+        navigate({ to: "/triagem/$sessionId" as any, params: { sessionId: s.id } as any });
       } else {
         const s = await triageApi.sendMessage(session.id, text);
         setSession(s);

@@ -344,7 +344,7 @@ export const uploadsApi = {
 // ===== Auth =====
 export type UserRole = "reception" | "admin" | "super_admin" | "tenant_admin" | string;
 export interface AuthUser {
-  id: string;
+  user_id: string;
   email: string;
   name?: string;
   role: UserRole;
@@ -356,8 +356,11 @@ export const authApi = {
     return data;
   },
   login: async (email: string, password: string): Promise<AuthUser> => {
-    const { data } = await api.post<AuthUser>("/auth/login", { email, password });
-    return data;
+    const { data } = await api.post<{ access_token: string; refresh_token: string; user: AuthUser }>(
+      "/auth/login",
+      { email, password },
+    );
+    return data.user;
   },
   logout: async (): Promise<void> => {
     await api.post("/auth/logout");
@@ -464,7 +467,7 @@ export interface ScheduleOverride {
   date: string;
   type: "off" | "custom";
   reason?: string;
-  ranges?: TimeRange[];
+  slots?: TimeRange[];
 }
 export interface WorkingHours {
   professional_id: string;

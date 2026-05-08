@@ -15,6 +15,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminUnidadesRouteImport } from './routes/admin.unidades'
 import { Route as AdminEspecialidadesRouteImport } from './routes/admin.especialidades'
 
 const TriagemRoute = TriagemRouteImport.update({
@@ -47,6 +48,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminUnidadesRoute = AdminUnidadesRouteImport.update({
+  id: '/unidades',
+  path: '/unidades',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminEspecialidadesRoute = AdminEspecialidadesRouteImport.update({
   id: '/especialidades',
   path: '/especialidades',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/triagem': typeof TriagemRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
+  '/admin/unidades': typeof AdminUnidadesRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/triagem': typeof TriagemRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
+  '/admin/unidades': typeof AdminUnidadesRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -78,6 +86,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/triagem': typeof TriagemRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
+  '/admin/unidades': typeof AdminUnidadesRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -89,6 +98,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/triagem'
     | '/admin/especialidades'
+    | '/admin/unidades'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/triagem'
     | '/admin/especialidades'
+    | '/admin/unidades'
     | '/admin'
   id:
     | '__root__'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/triagem'
     | '/admin/especialidades'
+    | '/admin/unidades'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -161,6 +173,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/unidades': {
+      id: '/admin/unidades'
+      path: '/unidades'
+      fullPath: '/admin/unidades'
+      preLoaderRoute: typeof AdminUnidadesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/especialidades': {
       id: '/admin/especialidades'
       path: '/especialidades'
@@ -173,11 +192,13 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminEspecialidadesRoute: typeof AdminEspecialidadesRoute
+  AdminUnidadesRoute: typeof AdminUnidadesRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminEspecialidadesRoute: AdminEspecialidadesRoute,
+  AdminUnidadesRoute: AdminUnidadesRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

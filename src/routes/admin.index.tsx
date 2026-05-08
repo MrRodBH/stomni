@@ -22,11 +22,14 @@ import {
   abandonmentApi,
   advancedAnalyticsApi,
   analyticsApi,
+  quotaApi,
   type AbandonmentAnalytics,
   type AdvancedAnalytics,
+  type QuotaStatus,
 } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Lightbulb } from "lucide-react";
+import { ChevronDown, ChevronUp, Lightbulb, Gauge } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({

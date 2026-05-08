@@ -8,6 +8,8 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { knowledgeApi, type KnowledgeDoc } from "@/lib/api";
 
 export const Route = createFileRoute("/admin/conhecimento")({
@@ -22,6 +24,7 @@ function KnowledgePage() {
   const qc = useQueryClient();
   const inputRef = useRef<HTMLInputElement>(null);
   const [drag, setDrag] = useState(false);
+  const [cleanNoise, setCleanNoise] = useState(true);
 
   const docsQ = useQuery({
     queryKey: ["kb", "list"],
@@ -33,7 +36,7 @@ function KnowledgePage() {
   });
 
   const uploadM = useMutation({
-    mutationFn: (file: File) => knowledgeApi.upload(file),
+    mutationFn: (file: File) => knowledgeApi.upload(file, cleanNoise),
     onSuccess: (doc) => {
       qc.invalidateQueries({ queryKey: ["kb"] });
       if (doc.indexed_status === "empty" || doc.status === "empty") {
@@ -105,6 +108,13 @@ function KnowledgePage() {
           className="hidden"
           onChange={(e) => { handleFiles(e.target.files); e.currentTarget.value = ""; }}
         />
+        <div className="mt-5 flex items-center justify-center gap-3 border-t pt-4">
+          <Switch id="clean-noise" checked={cleanNoise} onCheckedChange={setCleanNoise} />
+          <Label htmlFor="clean-noise" className="cursor-pointer text-sm">
+            Limpar páginas de capa, sumário e referências{" "}
+            <span className="text-muted-foreground">(recomendado)</span>
+          </Label>
+        </div>
       </Card>
 
       <Card className="overflow-hidden">

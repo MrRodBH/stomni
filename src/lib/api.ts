@@ -737,7 +737,7 @@ export const adminTriageApi = {
 
 // ===== Billing / Signup (Fase 5) =====
 export interface Plan {
-  id: "trial" | "basic" | "pro";
+  id: string;
   name: string;
   amount: number;
   currency: string;
@@ -772,8 +772,9 @@ export const billingApi = {
     clinic_name: string;
     contact_email: string;
     admin_password: string;
-    plan_id: "trial" | "basic" | "pro";
+    plan_id: string;
     origin_url: string;
+    referral_code?: string;
   }) => (await api.post<SignupResponse>("/signup/tenant", payload)).data,
   checkoutStatus: async (sessionId: string) =>
     (await api.get<CheckoutStatus>(`/billing/checkout/status/${sessionId}`)).data,

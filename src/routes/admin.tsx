@@ -4,7 +4,7 @@ import { RequireAuth, ADMIN_ROLES, useAuth, useLogout } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, Stethoscope, Users, Building2, LogOut, BookOpen,
-  MessageSquare, Settings, Gift, Package, Megaphone,
+  MessageSquare, Settings, Gift, Package, Megaphone, UsersRound,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -17,6 +17,7 @@ export const Route = createFileRoute("/admin")({
 const NAV: { to: string; label: string; icon: any; exact?: boolean }[] = [
   { to: "/admin", label: "Visão geral", icon: LayoutDashboard, exact: true },
   { to: "/admin/triagens", label: "Triagens", icon: MessageSquare },
+  { to: "/admin/pacientes", label: "Pacientes", icon: UsersRound },
   { to: "/admin/especialidades", label: "Especialidades", icon: Stethoscope },
   { to: "/admin/profissionais", label: "Profissionais", icon: Users },
   { to: "/admin/unidades", label: "Unidades", icon: Building2 },

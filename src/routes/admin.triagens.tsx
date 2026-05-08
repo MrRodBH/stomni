@@ -12,7 +12,8 @@ import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
 } from "@/components/ui/sheet";
 import {
-  adminTriageApi, type AdminTriageSessionItem, type TriageSession,
+  adminTriageApi, patientsApi,
+  type AdminTriageSessionItem, type TriageSession,
 } from "@/lib/api";
 
 export const Route = createFileRoute("/admin/triagens")({
@@ -36,6 +37,20 @@ function TriagensPage() {
     refetchInterval: 30_000,
     staleTime: 0,
   });
+
+  const patientsQ = useQuery({
+    queryKey: ["admin-patients", "recurring-set", 2],
+    queryFn: () => patientsApi.list(2, 500),
+    staleTime: 60_000,
+  });
+
+  const recurringMap = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const p of patientsQ.data?.patients ?? []) {
+      if (p.whatsapp_normalized) m.set(p.whatsapp_normalized, p.total_visits);
+    }
+    return m;
+  }, [patientsQ.data]);
 
   const all = listQ.data ?? [];
   const visible = useMemo(() => {
@@ -118,6 +133,7 @@ function TriagensPage() {
                 <tr>
                   <th className="px-3 py-2">Status</th>
                   <th className="px-3 py-2">Queixa principal</th>
+                  <th className="px-3 py-2"></th>
                   <th className="px-3 py-2">Urgência</th>
                   <th className="px-3 py-2">Especialidade</th>
                   <th className="px-3 py-2">Estado</th>
@@ -128,7 +144,16 @@ function TriagensPage() {
               </thead>
               <tbody>
                 {visible.map((s) => (
-                  <SessionRow key={s.id} s={s} onOpen={() => setOpenId(s.id)} />
+                  <SessionRow
+                    key={s.id}
+                    s={s}
+                    recurringVisits={
+                      s.patient_whatsapp_normalized
+                        ? recurringMap.get(s.patient_whatsapp_normalized) ?? null
+                        : null
+                    }
+                    onOpen={() => setOpenId(s.id)}
+                  />
                 ))}
               </tbody>
             </table>
@@ -167,7 +192,13 @@ function FilterBtn({
   );
 }
 
-function SessionRow({ s, onOpen }: { s: AdminTriageSessionItem; onOpen: () => void }) {
+function SessionRow({
+  s, onOpen, recurringVisits,
+}: {
+  s: AdminTriageSessionItem;
+  onOpen: () => void;
+  recurringVisits: number | null;
+}) {
   const status = s.is_emergency
     ? { cls: "bg-destructive text-destructive-foreground animate-pulse", label: "Emergência" }
     : (s.urgency_score ?? 0) >= 4
@@ -184,6 +215,16 @@ function SessionRow({ s, onOpen }: { s: AdminTriageSessionItem; onOpen: () => vo
         </span>
       </td>
       <td className="max-w-[260px] truncate px-3 py-2">{queixa}</td>
+      <td className="px-3 py-2">
+        {recurringVisits ? (
+          <span
+            title={`${recurringVisits} visitas anteriores`}
+            className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary"
+          >
+            🔁 Recorrente
+          </span>
+        ) : null}
+      </td>
       <td className="px-3 py-2">
         <Badge variant="outline">{s.urgency_score != null ? `${s.urgency_score}/10` : "—"}</Badge>
       </td>

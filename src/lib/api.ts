@@ -745,6 +745,8 @@ export interface AdminTriageSessionItem {
   created_at: string;
   updated_at: string;
   linked_triage_id: string | null;
+  patient_whatsapp_normalized?: string | null;
+  patient_name?: string | null;
 }
 
 export const adminTriageApi = {
@@ -936,4 +938,53 @@ export const referralApi = {
     (await api.get<MyReferral>("/admin/referral")).data,
   lookupCode: async (code: string): Promise<ReferralCodeLookup> =>
     (await api.get<ReferralCodeLookup>(`/billing/referral-code/${code}`)).data,
+};
+
+// ===== Patient Profiles (Fase 5.8) =====
+export interface PatientProfileSummary {
+  id: string;
+  name: string;
+  whatsapp: string;
+  whatsapp_normalized: string;
+  total_visits: number;
+  first_seen_at: string;
+  last_seen_at: string;
+  last_specialty?: string | null;
+  last_complaint?: string | null;
+  last_classification?: "low" | "medium" | "high" | null;
+  specialties_history: string[];
+}
+
+export interface PatientTriageRecord {
+  protocol: string;
+  date: string;
+  time: string;
+  specialty?: string | null;
+  classification?: "low" | "medium" | "high" | null;
+  main_complaint?: string | null;
+  clinic_name?: string | null;
+  created_at: string;
+}
+
+export interface PatientProfileDetail extends PatientProfileSummary {
+  triages: PatientTriageRecord[];
+}
+
+export const patientsApi = {
+  list: async (
+    minVisits = 2,
+    limit = 100,
+  ): Promise<{ count: number; patients: PatientProfileSummary[] }> => {
+    const { data } = await api.get<{ count: number; patients: PatientProfileSummary[] }>(
+      `/admin/patients?min_visits=${minVisits}&limit=${limit}`,
+    );
+    return {
+      count: data?.count ?? 0,
+      patients: Array.isArray(data?.patients) ? data.patients : [],
+    };
+  },
+  get: async (id: string): Promise<PatientProfileDetail> => {
+    const { data } = await api.get<PatientProfileDetail>(`/admin/patients/${id}`);
+    return data;
+  },
 };

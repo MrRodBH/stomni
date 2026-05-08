@@ -18,11 +18,13 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as TriagemSessionIdRouteImport } from './routes/triagem.$sessionId'
+import { Route as SuperAdminPlanosRouteImport } from './routes/super-admin.planos'
 import { Route as SignupSucessoRouteImport } from './routes/signup.sucesso'
 import { Route as SignupCanceladoRouteImport } from './routes/signup.cancelado'
 import { Route as AdminUnidadesRouteImport } from './routes/admin.unidades'
 import { Route as AdminTriagensRouteImport } from './routes/admin.triagens'
 import { Route as AdminProfissionaisRouteImport } from './routes/admin.profissionais'
+import { Route as AdminIndicacoesRouteImport } from './routes/admin.indicacoes'
 import { Route as AdminEspecialidadesRouteImport } from './routes/admin.especialidades'
 import { Route as AdminConhecimentoRouteImport } from './routes/admin.conhecimento'
 import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
@@ -73,6 +75,11 @@ const TriagemSessionIdRoute = TriagemSessionIdRouteImport.update({
   path: '/$sessionId',
   getParentRoute: () => TriagemRoute,
 } as any)
+const SuperAdminPlanosRoute = SuperAdminPlanosRouteImport.update({
+  id: '/super-admin/planos',
+  path: '/super-admin/planos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupSucessoRoute = SignupSucessoRouteImport.update({
   id: '/signup/sucesso',
   path: '/signup/sucesso',
@@ -96,6 +103,11 @@ const AdminTriagensRoute = AdminTriagensRouteImport.update({
 const AdminProfissionaisRoute = AdminProfissionaisRouteImport.update({
   id: '/profissionais',
   path: '/profissionais',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminIndicacoesRoute = AdminIndicacoesRouteImport.update({
+  id: '/indicacoes',
+  path: '/indicacoes',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminEspecialidadesRoute = AdminEspecialidadesRouteImport.update({
@@ -131,11 +143,13 @@ export interface FileRoutesByFullPath {
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/conhecimento': typeof AdminConhecimentoRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
+  '/admin/indicacoes': typeof AdminIndicacoesRoute
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
   '/signup/cancelado': typeof SignupCanceladoRoute
   '/signup/sucesso': typeof SignupSucessoRoute
+  '/super-admin/planos': typeof SuperAdminPlanosRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/profissionais/$id/horarios': typeof AdminProfissionaisIdHorariosRoute
@@ -150,11 +164,13 @@ export interface FileRoutesByTo {
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/conhecimento': typeof AdminConhecimentoRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
+  '/admin/indicacoes': typeof AdminIndicacoesRoute
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
   '/signup/cancelado': typeof SignupCanceladoRoute
   '/signup/sucesso': typeof SignupSucessoRoute
+  '/super-admin/planos': typeof SuperAdminPlanosRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin': typeof AdminIndexRoute
   '/admin/profissionais/$id/horarios': typeof AdminProfissionaisIdHorariosRoute
@@ -171,11 +187,13 @@ export interface FileRoutesById {
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/conhecimento': typeof AdminConhecimentoRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
+  '/admin/indicacoes': typeof AdminIndicacoesRoute
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
   '/signup/cancelado': typeof SignupCanceladoRoute
   '/signup/sucesso': typeof SignupSucessoRoute
+  '/super-admin/planos': typeof SuperAdminPlanosRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/profissionais/$id/horarios': typeof AdminProfissionaisIdHorariosRoute
@@ -193,11 +211,13 @@ export interface FileRouteTypes {
     | '/admin/configuracoes'
     | '/admin/conhecimento'
     | '/admin/especialidades'
+    | '/admin/indicacoes'
     | '/admin/profissionais'
     | '/admin/triagens'
     | '/admin/unidades'
     | '/signup/cancelado'
     | '/signup/sucesso'
+    | '/super-admin/planos'
     | '/triagem/$sessionId'
     | '/admin/'
     | '/admin/profissionais/$id/horarios'
@@ -212,11 +232,13 @@ export interface FileRouteTypes {
     | '/admin/configuracoes'
     | '/admin/conhecimento'
     | '/admin/especialidades'
+    | '/admin/indicacoes'
     | '/admin/profissionais'
     | '/admin/triagens'
     | '/admin/unidades'
     | '/signup/cancelado'
     | '/signup/sucesso'
+    | '/super-admin/planos'
     | '/triagem/$sessionId'
     | '/admin'
     | '/admin/profissionais/$id/horarios'
@@ -232,11 +254,13 @@ export interface FileRouteTypes {
     | '/admin/configuracoes'
     | '/admin/conhecimento'
     | '/admin/especialidades'
+    | '/admin/indicacoes'
     | '/admin/profissionais'
     | '/admin/triagens'
     | '/admin/unidades'
     | '/signup/cancelado'
     | '/signup/sucesso'
+    | '/super-admin/planos'
     | '/triagem/$sessionId'
     | '/admin/'
     | '/admin/profissionais/$id/horarios'
@@ -252,6 +276,7 @@ export interface RootRouteChildren {
   TriagemRoute: typeof TriagemRouteWithChildren
   SignupCanceladoRoute: typeof SignupCanceladoRoute
   SignupSucessoRoute: typeof SignupSucessoRoute
+  SuperAdminPlanosRoute: typeof SuperAdminPlanosRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -319,6 +344,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TriagemSessionIdRouteImport
       parentRoute: typeof TriagemRoute
     }
+    '/super-admin/planos': {
+      id: '/super-admin/planos'
+      path: '/super-admin/planos'
+      fullPath: '/super-admin/planos'
+      preLoaderRoute: typeof SuperAdminPlanosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup/sucesso': {
       id: '/signup/sucesso'
       path: '/signup/sucesso'
@@ -352,6 +384,13 @@ declare module '@tanstack/react-router' {
       path: '/profissionais'
       fullPath: '/admin/profissionais'
       preLoaderRoute: typeof AdminProfissionaisRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/indicacoes': {
+      id: '/admin/indicacoes'
+      path: '/indicacoes'
+      fullPath: '/admin/indicacoes'
+      preLoaderRoute: typeof AdminIndicacoesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/especialidades': {
@@ -400,6 +439,7 @@ interface AdminRouteChildren {
   AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
   AdminConhecimentoRoute: typeof AdminConhecimentoRoute
   AdminEspecialidadesRoute: typeof AdminEspecialidadesRoute
+  AdminIndicacoesRoute: typeof AdminIndicacoesRoute
   AdminProfissionaisRoute: typeof AdminProfissionaisRouteWithChildren
   AdminTriagensRoute: typeof AdminTriagensRoute
   AdminUnidadesRoute: typeof AdminUnidadesRoute
@@ -410,6 +450,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminConfiguracoesRoute: AdminConfiguracoesRoute,
   AdminConhecimentoRoute: AdminConhecimentoRoute,
   AdminEspecialidadesRoute: AdminEspecialidadesRoute,
+  AdminIndicacoesRoute: AdminIndicacoesRoute,
   AdminProfissionaisRoute: AdminProfissionaisRouteWithChildren,
   AdminTriagensRoute: AdminTriagensRoute,
   AdminUnidadesRoute: AdminUnidadesRoute,
@@ -439,7 +480,18 @@ const rootRouteChildren: RootRouteChildren = {
   TriagemRoute: TriagemRouteWithChildren,
   SignupCanceladoRoute: SignupCanceladoRoute,
   SignupSucessoRoute: SignupSucessoRoute,
+  SuperAdminPlanosRoute: SuperAdminPlanosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

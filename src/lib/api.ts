@@ -323,12 +323,15 @@ export const knowledgeApi = {
     );
     return data;
   },
-  upload: async (file: File): Promise<KnowledgeDoc> => {
+  upload: async (file: File, clean_noise: boolean = true): Promise<KnowledgeDoc> => {
     const fd = new FormData();
     fd.append("file", file);
-    const { data } = await api.post<KnowledgeDoc>("/admin/knowledge/upload", fd, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const params = new URLSearchParams({ clean_noise: String(clean_noise) });
+    const { data } = await api.post<KnowledgeDoc>(
+      `/admin/knowledge/upload?${params}`,
+      fd,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
     return data;
   },
   remove: async (id: string): Promise<{ deleted: string; chunks_removed: number }> => {

@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, Stethoscope, Building2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { patientsApi, type PatientTriageRecord } from "@/lib/api";
+import { patientsApi, type PatientProfileDetail, type PatientTriageRecord } from "@/lib/api";
 import { classBadge, relativeTime } from "./admin.pacientes";
 
 export const Route = createFileRoute("/admin/pacientes/$id")({
@@ -64,7 +64,7 @@ function PatientDetailPage() {
   );
 }
 
-function Summary({ p }: { p: NonNullable<ReturnType<typeof patientsApi.get> extends Promise<infer T> ? T : never> }) {
+function Summary({ p }: { p: PatientProfileDetail }) {
   const counts = new Map<string, number>();
   for (const s of p.specialties_history) {
     counts.set(s, (counts.get(s) ?? 0) + 1);

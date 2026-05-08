@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "sonner";
 
 const API_URL =
   (import.meta as any).env?.VITE_API_URL ||
@@ -24,6 +25,34 @@ api.interceptors.request.use((config) => {
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
+
+// Global handler for 402 Payment Required (quota / plan limits)
+let lastQuotaToastAt = 0;
+api.interceptors.response.use(
+  (resp) => resp,
+  (error) => {
+    if (error?.response?.status === 402) {
+      const now = Date.now();
+      if (now - lastQuotaToastAt > 1500) {
+        lastQuotaToastAt = now;
+        const detail =
+          error.response?.data?.detail ||
+          error.response?.data?.message ||
+          "Limite do plano atingido. Faça upgrade para continuar.";
+        toast.error(typeof detail === "string" ? detail : "Limite do plano atingido.", {
+          duration: 8000,
+          action: {
+            label: "Ver planos",
+            onClick: () => {
+              if (typeof window !== "undefined") window.location.href = "/precos";
+            },
+          },
+        });
+      }
+    }
+    return Promise.reject(error);
+  },
+);
 
 export type UrgencyLevel = "low" | "medium" | "high";
 export type AttendanceType =
@@ -771,6 +800,23 @@ export const abandonmentApi = {
     const { data } = await api.get<AbandonmentAnalytics>(
       `/analytics/abandonment${qs ? "?" + qs : ""}`,
     );
+    return data;
+  },
+};
+
+// ===== Quota (Fase 5.5) =====
+export interface QuotaStatus {
+  plan: string | null;
+  status: string | null;
+  limits: { max_triages_per_month: number; max_units: number };
+  usage: { triages_this_month: number; units: number };
+  remaining: { triages_this_month: number; units: number };
+  near_limit: { triages_this_month: boolean; units: boolean };
+}
+
+export const quotaApi = {
+  get: async (): Promise<QuotaStatus> => {
+    const { data } = await api.get<QuotaStatus>("/admin/quota");
     return data;
   },
 };

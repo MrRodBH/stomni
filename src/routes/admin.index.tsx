@@ -22,11 +22,14 @@ import {
   abandonmentApi,
   advancedAnalyticsApi,
   analyticsApi,
+  quotaApi,
   type AbandonmentAnalytics,
   type AdvancedAnalytics,
+  type QuotaStatus,
 } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Lightbulb } from "lucide-react";
+import { ChevronDown, ChevronUp, Lightbulb, Gauge } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({
@@ -70,6 +73,12 @@ function AdminDashboard() {
     staleTime: 60_000,
   });
 
+  const quotaQuery = useQuery({
+    queryKey: ["admin-quota"],
+    queryFn: () => quotaApi.get(),
+    staleTime: 30_000,
+  });
+
   const setShortcut = (s: "7" | "30" | "90" | "this" | "last") => {
     const today = new Date();
     if (s === "7") { setFrom(subDays(today, 7)); setTo(today); }
@@ -90,6 +99,7 @@ function AdminDashboard() {
 
   return (
     <div className="space-y-6">
+      {quotaQuery.data && <QuotaCard quota={quotaQuery.data} />}
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard Executivo</h1>
@@ -568,5 +578,67 @@ function MiniStat({
       <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</p>
       <p className={cn("mt-0.5 text-xl font-bold", color)}>{value}</p>
     </div>
+  );
+}
+
+function QuotaCard({ quota }: { quota: QuotaStatus }) {
+  const fmtLimit = (n: number) => (n === -1 ? "Ilimitado" : n.toLocaleString("pt-BR"));
+  const pct = (used: number, max: number) =>
+    max === -1 ? 0 : Math.min(100, Math.round((used / Math.max(1, max)) * 100));
+
+  const triagesPct = pct(quota.usage.triages_this_month, quota.limits.max_triages_per_month);
+  const unitsPct = pct(quota.usage.units, quota.limits.max_units);
+  const anyNear = quota.near_limit.triages_this_month || quota.near_limit.units;
+
+  const planLabel = quota.plan ? quota.plan.charAt(0).toUpperCase() + quota.plan.slice(1) : "—";
+  const statusTone =
+    quota.status === "active" ? "bg-emerald-600" :
+    quota.status === "trial" ? "bg-blue-600" :
+    quota.status === "pending_payment" ? "bg-amber-600" : "bg-muted";
+
+  return (
+    <Card className="p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Gauge className="h-4 w-4 text-muted-foreground" />
+          <h2 className="text-sm font-semibold">Uso do Plano</h2>
+          <Badge className={cn("text-white", statusTone)}>{planLabel}</Badge>
+          {quota.status && (
+            <Badge variant="outline" className="text-xs">{quota.status}</Badge>
+          )}
+        </div>
+        <Button size="sm" variant="outline" onClick={() => { window.location.href = "/precos"; }}>
+          Mudar plano
+        </Button>
+      </div>
+
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <div>
+          <div className="flex items-baseline justify-between text-xs">
+            <span className="text-muted-foreground">Triagens este mês</span>
+            <span className="font-medium">
+              {quota.usage.triages_this_month.toLocaleString("pt-BR")} / {fmtLimit(quota.limits.max_triages_per_month)}
+            </span>
+          </div>
+          <Progress value={triagesPct} className="mt-2" />
+        </div>
+        <div>
+          <div className="flex items-baseline justify-between text-xs">
+            <span className="text-muted-foreground">Unidades</span>
+            <span className="font-medium">
+              {quota.usage.units.toLocaleString("pt-BR")} / {fmtLimit(quota.limits.max_units)}
+            </span>
+          </div>
+          <Progress value={unitsPct} className="mt-2" />
+        </div>
+      </div>
+
+      {anyNear && (
+        <div className="mt-4 flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>Você está se aproximando do limite. Considere fazer upgrade.</span>
+        </div>
+      )}
+    </Card>
   );
 }

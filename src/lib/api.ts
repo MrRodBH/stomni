@@ -821,3 +821,91 @@ export const quotaApi = {
     return data;
   },
 };
+
+// ===== Super-Admin: Plans CRUD (Fase 5.6) =====
+export interface AdminPlan {
+  id: string;
+  name: string;
+  amount: number;
+  currency: string;
+  description: string;
+  max_triages_per_month: number; // -1 = unlimited
+  max_units: number; // -1 = unlimited
+  is_active: boolean;
+  is_public: boolean;
+  sort_order: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export const superAdminPlansApi = {
+  list: async (): Promise<AdminPlan[]> =>
+    (await api.get<{ plans: AdminPlan[] }>("/super-admin/plans")).data.plans,
+  create: async (plan: AdminPlan): Promise<AdminPlan> =>
+    (await api.post<AdminPlan>("/super-admin/plans", plan)).data,
+  update: async (id: string, patch: Partial<AdminPlan>): Promise<AdminPlan> =>
+    (await api.patch<AdminPlan>(`/super-admin/plans/${id}`, patch)).data,
+  remove: async (id: string): Promise<{ deleted: string }> =>
+    (await api.delete<{ deleted: string }>(`/super-admin/plans/${id}`)).data,
+};
+
+// ===== Super-Admin: Referral Program =====
+export interface ReferralProgram {
+  enabled: boolean;
+  bonus_per_referral: number;
+  max_accumulated_bonus: number;
+  max_referrals_per_month: number;
+  min_plan_to_trigger: string;
+  campaign_name: string;
+  starts_at?: string | null;
+  ends_at?: string | null;
+  updated_at?: string | null;
+}
+
+export const superAdminReferralApi = {
+  get: async (): Promise<ReferralProgram> =>
+    (await api.get<ReferralProgram>("/super-admin/referral-program")).data,
+  update: async (data: ReferralProgram): Promise<ReferralProgram> =>
+    (await api.put<ReferralProgram>("/super-admin/referral-program", data)).data,
+};
+
+// ===== Tenant-facing: My referral page =====
+export interface ReferralCredit {
+  date?: string;
+  created_at?: string;
+  tenant_name?: string;
+  amount?: number;
+  [k: string]: unknown;
+}
+
+export interface MyReferral {
+  referral_code: string | null;
+  bonus_triages: number;
+  program: {
+    active: boolean;
+    bonus_per_referral: number;
+    campaign_name: string;
+    ends_at: string | null;
+    min_plan_to_trigger: string;
+  };
+  stats: {
+    invited_total: number;
+    invited_paid: number;
+    total_bonus_credited: number;
+    recent_credits: ReferralCredit[];
+  };
+}
+
+export interface ReferralCodeLookup {
+  valid: boolean;
+  inviter_name?: string;
+  bonus_per_referral?: number;
+  reason?: string;
+}
+
+export const referralApi = {
+  me: async (): Promise<MyReferral> =>
+    (await api.get<MyReferral>("/admin/referral")).data,
+  lookupCode: async (code: string): Promise<ReferralCodeLookup> =>
+    (await api.get<ReferralCodeLookup>(`/billing/referral-code/${code}`)).data,
+};

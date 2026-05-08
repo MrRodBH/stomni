@@ -26,99 +26,32 @@ import { Route as AdminProfissionaisRouteImport } from './routes/admin.profissio
 import { Route as AdminEspecialidadesRouteImport } from './routes/admin.especialidades'
 import { Route as AdminConhecimentoRouteImport } from './routes/admin.conhecimento'
 import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
+import { Route as AdminIndicacoesRouteImport } from './routes/admin.indicacoes'
 import { Route as AdminProfissionaisIdHorariosRouteImport } from './routes/admin.profissionais.$id.horarios'
+import { Route as SuperAdminPlanosRouteImport } from './routes/super-admin.planos'
+import { Route as SuperAdminIndicacoesRouteImport } from './routes/super-admin.indicacoes'
 
-const TriagemRoute = TriagemRouteImport.update({
-  id: '/triagem',
-  path: '/triagem',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrecosRoute = PrecosRouteImport.update({
-  id: '/precos',
-  path: '/precos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CadastroRoute = CadastroRouteImport.update({
-  id: '/cadastro',
-  path: '/cadastro',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const TriagemSessionIdRoute = TriagemSessionIdRouteImport.update({
-  id: '/$sessionId',
-  path: '/$sessionId',
-  getParentRoute: () => TriagemRoute,
-} as any)
-const SignupSucessoRoute = SignupSucessoRouteImport.update({
-  id: '/signup/sucesso',
-  path: '/signup/sucesso',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignupCanceladoRoute = SignupCanceladoRouteImport.update({
-  id: '/signup/cancelado',
-  path: '/signup/cancelado',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminUnidadesRoute = AdminUnidadesRouteImport.update({
-  id: '/unidades',
-  path: '/unidades',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminTriagensRoute = AdminTriagensRouteImport.update({
-  id: '/triagens',
-  path: '/triagens',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminProfissionaisRoute = AdminProfissionaisRouteImport.update({
-  id: '/profissionais',
-  path: '/profissionais',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminEspecialidadesRoute = AdminEspecialidadesRouteImport.update({
-  id: '/especialidades',
-  path: '/especialidades',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminConhecimentoRoute = AdminConhecimentoRouteImport.update({
-  id: '/conhecimento',
-  path: '/conhecimento',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
-  id: '/configuracoes',
-  path: '/configuracoes',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminProfissionaisIdHorariosRoute =
-  AdminProfissionaisIdHorariosRouteImport.update({
-    id: '/$id/horarios',
-    path: '/$id/horarios',
-    getParentRoute: () => AdminProfissionaisRoute,
-  } as any)
+const TriagemRoute = TriagemRouteImport.update({ id: '/triagem', path: '/triagem', getParentRoute: () => rootRouteImport } as any)
+const PrecosRoute = PrecosRouteImport.update({ id: '/precos', path: '/precos', getParentRoute: () => rootRouteImport } as any)
+const LoginRoute = LoginRouteImport.update({ id: '/login', path: '/login', getParentRoute: () => rootRouteImport } as any)
+const DashboardRoute = DashboardRouteImport.update({ id: '/dashboard', path: '/dashboard', getParentRoute: () => rootRouteImport } as any)
+const CadastroRoute = CadastroRouteImport.update({ id: '/cadastro', path: '/cadastro', getParentRoute: () => rootRouteImport } as any)
+const AdminRoute = AdminRouteImport.update({ id: '/admin', path: '/admin', getParentRoute: () => rootRouteImport } as any)
+const IndexRoute = IndexRouteImport.update({ id: '/', path: '/', getParentRoute: () => rootRouteImport } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({ id: '/', path: '/', getParentRoute: () => AdminRoute } as any)
+const TriagemSessionIdRoute = TriagemSessionIdRouteImport.update({ id: '/$sessionId', path: '/$sessionId', getParentRoute: () => TriagemRoute } as any)
+const SignupSucessoRoute = SignupSucessoRouteImport.update({ id: '/signup/sucesso', path: '/signup/sucesso', getParentRoute: () => rootRouteImport } as any)
+const SignupCanceladoRoute = SignupCanceladoRouteImport.update({ id: '/signup/cancelado', path: '/signup/cancelado', getParentRoute: () => rootRouteImport } as any)
+const AdminUnidadesRoute = AdminUnidadesRouteImport.update({ id: '/unidades', path: '/unidades', getParentRoute: () => AdminRoute } as any)
+const AdminTriagensRoute = AdminTriagensRouteImport.update({ id: '/triagens', path: '/triagens', getParentRoute: () => AdminRoute } as any)
+const AdminProfissionaisRoute = AdminProfissionaisRouteImport.update({ id: '/profissionais', path: '/profissionais', getParentRoute: () => AdminRoute } as any)
+const AdminEspecialidadesRoute = AdminEspecialidadesRouteImport.update({ id: '/especialidades', path: '/especialidades', getParentRoute: () => AdminRoute } as any)
+const AdminConhecimentoRoute = AdminConhecimentoRouteImport.update({ id: '/conhecimento', path: '/conhecimento', getParentRoute: () => AdminRoute } as any)
+const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({ id: '/configuracoes', path: '/configuracoes', getParentRoute: () => AdminRoute } as any)
+const AdminIndicacoesRoute = AdminIndicacoesRouteImport.update({ id: '/indicacoes', path: '/indicacoes', getParentRoute: () => AdminRoute } as any)
+const AdminProfissionaisIdHorariosRoute = AdminProfissionaisIdHorariosRouteImport.update({ id: '/$id/horarios', path: '/$id/horarios', getParentRoute: () => AdminProfissionaisRoute } as any)
+const SuperAdminPlanosRoute = SuperAdminPlanosRouteImport.update({ id: '/super-admin/planos', path: '/super-admin/planos', getParentRoute: () => rootRouteImport } as any)
+const SuperAdminIndicacoesRoute = SuperAdminIndicacoesRouteImport.update({ id: '/super-admin/indicacoes', path: '/super-admin/indicacoes', getParentRoute: () => rootRouteImport } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -131,11 +64,14 @@ export interface FileRoutesByFullPath {
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/conhecimento': typeof AdminConhecimentoRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
+  '/admin/indicacoes': typeof AdminIndicacoesRoute
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
   '/signup/cancelado': typeof SignupCanceladoRoute
   '/signup/sucesso': typeof SignupSucessoRoute
+  '/super-admin/planos': typeof SuperAdminPlanosRoute
+  '/super-admin/indicacoes': typeof SuperAdminIndicacoesRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/profissionais/$id/horarios': typeof AdminProfissionaisIdHorariosRoute
@@ -150,11 +86,14 @@ export interface FileRoutesByTo {
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/conhecimento': typeof AdminConhecimentoRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
+  '/admin/indicacoes': typeof AdminIndicacoesRoute
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
   '/signup/cancelado': typeof SignupCanceladoRoute
   '/signup/sucesso': typeof SignupSucessoRoute
+  '/super-admin/planos': typeof SuperAdminPlanosRoute
+  '/super-admin/indicacoes': typeof SuperAdminIndicacoesRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin': typeof AdminIndexRoute
   '/admin/profissionais/$id/horarios': typeof AdminProfissionaisIdHorariosRoute
@@ -171,11 +110,14 @@ export interface FileRoutesById {
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/conhecimento': typeof AdminConhecimentoRoute
   '/admin/especialidades': typeof AdminEspecialidadesRoute
+  '/admin/indicacoes': typeof AdminIndicacoesRoute
   '/admin/profissionais': typeof AdminProfissionaisRouteWithChildren
   '/admin/triagens': typeof AdminTriagensRoute
   '/admin/unidades': typeof AdminUnidadesRoute
   '/signup/cancelado': typeof SignupCanceladoRoute
   '/signup/sucesso': typeof SignupSucessoRoute
+  '/super-admin/planos': typeof SuperAdminPlanosRoute
+  '/super-admin/indicacoes': typeof SuperAdminIndicacoesRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/profissionais/$id/horarios': typeof AdminProfissionaisIdHorariosRoute
@@ -193,11 +135,14 @@ export interface FileRouteTypes {
     | '/admin/configuracoes'
     | '/admin/conhecimento'
     | '/admin/especialidades'
+    | '/admin/indicacoes'
     | '/admin/profissionais'
     | '/admin/triagens'
     | '/admin/unidades'
     | '/signup/cancelado'
     | '/signup/sucesso'
+    | '/super-admin/planos'
+    | '/super-admin/indicacoes'
     | '/triagem/$sessionId'
     | '/admin/'
     | '/admin/profissionais/$id/horarios'
@@ -212,11 +157,14 @@ export interface FileRouteTypes {
     | '/admin/configuracoes'
     | '/admin/conhecimento'
     | '/admin/especialidades'
+    | '/admin/indicacoes'
     | '/admin/profissionais'
     | '/admin/triagens'
     | '/admin/unidades'
     | '/signup/cancelado'
     | '/signup/sucesso'
+    | '/super-admin/planos'
+    | '/super-admin/indicacoes'
     | '/triagem/$sessionId'
     | '/admin'
     | '/admin/profissionais/$id/horarios'
@@ -232,11 +180,14 @@ export interface FileRouteTypes {
     | '/admin/configuracoes'
     | '/admin/conhecimento'
     | '/admin/especialidades'
+    | '/admin/indicacoes'
     | '/admin/profissionais'
     | '/admin/triagens'
     | '/admin/unidades'
     | '/signup/cancelado'
     | '/signup/sucesso'
+    | '/super-admin/planos'
+    | '/super-admin/indicacoes'
     | '/triagem/$sessionId'
     | '/admin/'
     | '/admin/profissionais/$id/horarios'
@@ -252,182 +203,65 @@ export interface RootRouteChildren {
   TriagemRoute: typeof TriagemRouteWithChildren
   SignupCanceladoRoute: typeof SignupCanceladoRoute
   SignupSucessoRoute: typeof SignupSucessoRoute
+  SuperAdminPlanosRoute: typeof SuperAdminPlanosRoute
+  SuperAdminIndicacoesRoute: typeof SuperAdminIndicacoesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/triagem': {
-      id: '/triagem'
-      path: '/triagem'
-      fullPath: '/triagem'
-      preLoaderRoute: typeof TriagemRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/precos': {
-      id: '/precos'
-      path: '/precos'
-      fullPath: '/precos'
-      preLoaderRoute: typeof PrecosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cadastro': {
-      id: '/cadastro'
-      path: '/cadastro'
-      fullPath: '/cadastro'
-      preLoaderRoute: typeof CadastroRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/triagem/$sessionId': {
-      id: '/triagem/$sessionId'
-      path: '/$sessionId'
-      fullPath: '/triagem/$sessionId'
-      preLoaderRoute: typeof TriagemSessionIdRouteImport
-      parentRoute: typeof TriagemRoute
-    }
-    '/signup/sucesso': {
-      id: '/signup/sucesso'
-      path: '/signup/sucesso'
-      fullPath: '/signup/sucesso'
-      preLoaderRoute: typeof SignupSucessoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signup/cancelado': {
-      id: '/signup/cancelado'
-      path: '/signup/cancelado'
-      fullPath: '/signup/cancelado'
-      preLoaderRoute: typeof SignupCanceladoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/unidades': {
-      id: '/admin/unidades'
-      path: '/unidades'
-      fullPath: '/admin/unidades'
-      preLoaderRoute: typeof AdminUnidadesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/triagens': {
-      id: '/admin/triagens'
-      path: '/triagens'
-      fullPath: '/admin/triagens'
-      preLoaderRoute: typeof AdminTriagensRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/profissionais': {
-      id: '/admin/profissionais'
-      path: '/profissionais'
-      fullPath: '/admin/profissionais'
-      preLoaderRoute: typeof AdminProfissionaisRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/especialidades': {
-      id: '/admin/especialidades'
-      path: '/especialidades'
-      fullPath: '/admin/especialidades'
-      preLoaderRoute: typeof AdminEspecialidadesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/conhecimento': {
-      id: '/admin/conhecimento'
-      path: '/conhecimento'
-      fullPath: '/admin/conhecimento'
-      preLoaderRoute: typeof AdminConhecimentoRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/configuracoes': {
-      id: '/admin/configuracoes'
-      path: '/configuracoes'
-      fullPath: '/admin/configuracoes'
-      preLoaderRoute: typeof AdminConfiguracoesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/profissionais/$id/horarios': {
-      id: '/admin/profissionais/$id/horarios'
-      path: '/$id/horarios'
-      fullPath: '/admin/profissionais/$id/horarios'
-      preLoaderRoute: typeof AdminProfissionaisIdHorariosRouteImport
-      parentRoute: typeof AdminProfissionaisRoute
-    }
+    '/triagem': { id: '/triagem'; path: '/triagem'; fullPath: '/triagem'; preLoaderRoute: typeof TriagemRouteImport; parentRoute: typeof rootRouteImport }
+    '/precos': { id: '/precos'; path: '/precos'; fullPath: '/precos'; preLoaderRoute: typeof PrecosRouteImport; parentRoute: typeof rootRouteImport }
+    '/login': { id: '/login'; path: '/login'; fullPath: '/login'; preLoaderRoute: typeof LoginRouteImport; parentRoute: typeof rootRouteImport }
+    '/dashboard': { id: '/dashboard'; path: '/dashboard'; fullPath: '/dashboard'; preLoaderRoute: typeof DashboardRouteImport; parentRoute: typeof rootRouteImport }
+    '/cadastro': { id: '/cadastro'; path: '/cadastro'; fullPath: '/cadastro'; preLoaderRoute: typeof CadastroRouteImport; parentRoute: typeof rootRouteImport }
+    '/admin': { id: '/admin'; path: '/admin'; fullPath: '/admin'; preLoaderRoute: typeof AdminRouteImport; parentRoute: typeof rootRouteImport }
+    '/': { id: '/'; path: '/'; fullPath: '/'; preLoaderRoute: typeof IndexRouteImport; parentRoute: typeof rootRouteImport }
+    '/admin/': { id: '/admin/'; path: '/'; fullPath: '/admin/'; preLoaderRoute: typeof AdminIndexRouteImport; parentRoute: typeof AdminRoute }
+    '/triagem/$sessionId': { id: '/triagem/$sessionId'; path: '/$sessionId'; fullPath: '/triagem/$sessionId'; preLoaderRoute: typeof TriagemSessionIdRouteImport; parentRoute: typeof TriagemRoute }
+    '/signup/sucesso': { id: '/signup/sucesso'; path: '/signup/sucesso'; fullPath: '/signup/sucesso'; preLoaderRoute: typeof SignupSucessoRouteImport; parentRoute: typeof rootRouteImport }
+    '/signup/cancelado': { id: '/signup/cancelado'; path: '/signup/cancelado'; fullPath: '/signup/cancelado'; preLoaderRoute: typeof SignupCanceladoRouteImport; parentRoute: typeof rootRouteImport }
+    '/admin/unidades': { id: '/admin/unidades'; path: '/unidades'; fullPath: '/admin/unidades'; preLoaderRoute: typeof AdminUnidadesRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/triagens': { id: '/admin/triagens'; path: '/triagens'; fullPath: '/admin/triagens'; preLoaderRoute: typeof AdminTriagensRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/profissionais': { id: '/admin/profissionais'; path: '/profissionais'; fullPath: '/admin/profissionais'; preLoaderRoute: typeof AdminProfissionaisRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/especialidades': { id: '/admin/especialidades'; path: '/especialidades'; fullPath: '/admin/especialidades'; preLoaderRoute: typeof AdminEspecialidadesRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/conhecimento': { id: '/admin/conhecimento'; path: '/conhecimento'; fullPath: '/admin/conhecimento'; preLoaderRoute: typeof AdminConhecimentoRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/configuracoes': { id: '/admin/configuracoes'; path: '/configuracoes'; fullPath: '/admin/configuracoes'; preLoaderRoute: typeof AdminConfiguracoesRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/indicacoes': { id: '/admin/indicacoes'; path: '/indicacoes'; fullPath: '/admin/indicacoes'; preLoaderRoute: typeof AdminIndicacoesRouteImport; parentRoute: typeof AdminRoute }
+    '/admin/profissionais/$id/horarios': { id: '/admin/profissionais/$id/horarios'; path: '/$id/horarios'; fullPath: '/admin/profissionais/$id/horarios'; preLoaderRoute: typeof AdminProfissionaisIdHorariosRouteImport; parentRoute: typeof AdminProfissionaisRoute }
+    '/super-admin/planos': { id: '/super-admin/planos'; path: '/super-admin/planos'; fullPath: '/super-admin/planos'; preLoaderRoute: typeof SuperAdminPlanosRouteImport; parentRoute: typeof rootRouteImport }
+    '/super-admin/indicacoes': { id: '/super-admin/indicacoes'; path: '/super-admin/indicacoes'; fullPath: '/super-admin/indicacoes'; preLoaderRoute: typeof SuperAdminIndicacoesRouteImport; parentRoute: typeof rootRouteImport }
   }
 }
 
-interface AdminProfissionaisRouteChildren {
-  AdminProfissionaisIdHorariosRoute: typeof AdminProfissionaisIdHorariosRoute
-}
-
-const AdminProfissionaisRouteChildren: AdminProfissionaisRouteChildren = {
-  AdminProfissionaisIdHorariosRoute: AdminProfissionaisIdHorariosRoute,
-}
-
-const AdminProfissionaisRouteWithChildren =
-  AdminProfissionaisRoute._addFileChildren(AdminProfissionaisRouteChildren)
+interface AdminProfissionaisRouteChildren { AdminProfissionaisIdHorariosRoute: typeof AdminProfissionaisIdHorariosRoute }
+const AdminProfissionaisRouteChildren: AdminProfissionaisRouteChildren = { AdminProfissionaisIdHorariosRoute: AdminProfissionaisIdHorariosRoute }
+const AdminProfissionaisRouteWithChildren = AdminProfissionaisRoute._addFileChildren(AdminProfissionaisRouteChildren)
 
 interface AdminRouteChildren {
   AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
   AdminConhecimentoRoute: typeof AdminConhecimentoRoute
   AdminEspecialidadesRoute: typeof AdminEspecialidadesRoute
+  AdminIndicacoesRoute: typeof AdminIndicacoesRoute
   AdminProfissionaisRoute: typeof AdminProfissionaisRouteWithChildren
   AdminTriagensRoute: typeof AdminTriagensRoute
   AdminUnidadesRoute: typeof AdminUnidadesRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
-
 const AdminRouteChildren: AdminRouteChildren = {
   AdminConfiguracoesRoute: AdminConfiguracoesRoute,
   AdminConhecimentoRoute: AdminConhecimentoRoute,
   AdminEspecialidadesRoute: AdminEspecialidadesRoute,
+  AdminIndicacoesRoute: AdminIndicacoesRoute,
   AdminProfissionaisRoute: AdminProfissionaisRouteWithChildren,
   AdminTriagensRoute: AdminTriagensRoute,
   AdminUnidadesRoute: AdminUnidadesRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
-
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
-interface TriagemRouteChildren {
-  TriagemSessionIdRoute: typeof TriagemSessionIdRoute
-}
-
-const TriagemRouteChildren: TriagemRouteChildren = {
-  TriagemSessionIdRoute: TriagemSessionIdRoute,
-}
-
-const TriagemRouteWithChildren =
-  TriagemRoute._addFileChildren(TriagemRouteChildren)
+interface TriagemRouteChildren { TriagemSessionIdRoute: typeof TriagemSessionIdRoute }
+const TriagemRouteChildren: TriagemRouteChildren = { TriagemSessionIdRoute: TriagemSessionIdRoute }
+const TriagemRouteWithChildren = TriagemRoute._addFileChildren(TriagemRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -439,6 +273,8 @@ const rootRouteChildren: RootRouteChildren = {
   TriagemRoute: TriagemRouteWithChildren,
   SignupCanceladoRoute: SignupCanceladoRoute,
   SignupSucessoRoute: SignupSucessoRoute,
+  SuperAdminPlanosRoute: SuperAdminPlanosRoute,
+  SuperAdminIndicacoesRoute: SuperAdminIndicacoesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

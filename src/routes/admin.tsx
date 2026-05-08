@@ -4,7 +4,7 @@ import { RequireAuth, ADMIN_ROLES, useAuth, useLogout } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, Stethoscope, Users, Building2, LogOut, BookOpen,
-  MessageSquare, Settings,
+  MessageSquare, Settings, Gift, Package, Megaphone,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -21,7 +21,13 @@ const NAV: { to: string; label: string; icon: any; exact?: boolean }[] = [
   { to: "/admin/profissionais", label: "Profissionais", icon: Users },
   { to: "/admin/unidades", label: "Unidades", icon: Building2 },
   { to: "/admin/conhecimento", label: "Conhecimento", icon: BookOpen },
+  { to: "/admin/indicacoes", label: "Indicações", icon: Gift },
   { to: "/admin/configuracoes", label: "Configurações", icon: Settings },
+];
+
+const SUPER_NAV: { to: string; label: string; icon: any }[] = [
+  { to: "/super-admin/planos", label: "Planos", icon: Package },
+  { to: "/super-admin/indicacoes", label: "Indicações Globais", icon: Megaphone },
 ];
 
 function AdminLayout() {
@@ -67,6 +73,32 @@ function AdminShell() {
                 </Link>
               );
             })}
+            {user?.role === "super_admin" && (
+              <>
+                <p className="mt-4 px-3 pb-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Super Admin
+                </p>
+                {SUPER_NAV.map((item) => {
+                  const active = pathname.startsWith(item.to);
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.to}
+                      to={item.to as any}
+                      className={
+                        "flex items-center gap-2 rounded-md px-3 py-2 text-sm transition " +
+                        (active
+                          ? "bg-accent/70 text-primary font-medium"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground")
+                      }
+                    >
+                      <Icon className="h-4 w-4" />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </>
+            )}
           </nav>
           <div className="px-3 pt-4">
             <Button

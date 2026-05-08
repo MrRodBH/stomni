@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as TriagemSessionIdRouteImport } from './routes/triagem.$sessionId'
 import { Route as SuperAdminPlanosRouteImport } from './routes/super-admin.planos'
+import { Route as SuperAdminIndicacoesRouteImport } from './routes/super-admin.indicacoes'
 import { Route as SignupSucessoRouteImport } from './routes/signup.sucesso'
 import { Route as SignupCanceladoRouteImport } from './routes/signup.cancelado'
 import { Route as AdminUnidadesRouteImport } from './routes/admin.unidades'
@@ -78,6 +79,11 @@ const TriagemSessionIdRoute = TriagemSessionIdRouteImport.update({
 const SuperAdminPlanosRoute = SuperAdminPlanosRouteImport.update({
   id: '/super-admin/planos',
   path: '/super-admin/planos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuperAdminIndicacoesRoute = SuperAdminIndicacoesRouteImport.update({
+  id: '/super-admin/indicacoes',
+  path: '/super-admin/indicacoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignupSucessoRoute = SignupSucessoRouteImport.update({
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/admin/unidades': typeof AdminUnidadesRoute
   '/signup/cancelado': typeof SignupCanceladoRoute
   '/signup/sucesso': typeof SignupSucessoRoute
+  '/super-admin/indicacoes': typeof SuperAdminIndicacoesRoute
   '/super-admin/planos': typeof SuperAdminPlanosRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -170,6 +177,7 @@ export interface FileRoutesByTo {
   '/admin/unidades': typeof AdminUnidadesRoute
   '/signup/cancelado': typeof SignupCanceladoRoute
   '/signup/sucesso': typeof SignupSucessoRoute
+  '/super-admin/indicacoes': typeof SuperAdminIndicacoesRoute
   '/super-admin/planos': typeof SuperAdminPlanosRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin': typeof AdminIndexRoute
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/admin/unidades': typeof AdminUnidadesRoute
   '/signup/cancelado': typeof SignupCanceladoRoute
   '/signup/sucesso': typeof SignupSucessoRoute
+  '/super-admin/indicacoes': typeof SuperAdminIndicacoesRoute
   '/super-admin/planos': typeof SuperAdminPlanosRoute
   '/triagem/$sessionId': typeof TriagemSessionIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -217,6 +226,7 @@ export interface FileRouteTypes {
     | '/admin/unidades'
     | '/signup/cancelado'
     | '/signup/sucesso'
+    | '/super-admin/indicacoes'
     | '/super-admin/planos'
     | '/triagem/$sessionId'
     | '/admin/'
@@ -238,6 +248,7 @@ export interface FileRouteTypes {
     | '/admin/unidades'
     | '/signup/cancelado'
     | '/signup/sucesso'
+    | '/super-admin/indicacoes'
     | '/super-admin/planos'
     | '/triagem/$sessionId'
     | '/admin'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/admin/unidades'
     | '/signup/cancelado'
     | '/signup/sucesso'
+    | '/super-admin/indicacoes'
     | '/super-admin/planos'
     | '/triagem/$sessionId'
     | '/admin/'
@@ -276,6 +288,7 @@ export interface RootRouteChildren {
   TriagemRoute: typeof TriagemRouteWithChildren
   SignupCanceladoRoute: typeof SignupCanceladoRoute
   SignupSucessoRoute: typeof SignupSucessoRoute
+  SuperAdminIndicacoesRoute: typeof SuperAdminIndicacoesRoute
   SuperAdminPlanosRoute: typeof SuperAdminPlanosRoute
 }
 
@@ -349,6 +362,13 @@ declare module '@tanstack/react-router' {
       path: '/super-admin/planos'
       fullPath: '/super-admin/planos'
       preLoaderRoute: typeof SuperAdminPlanosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/super-admin/indicacoes': {
+      id: '/super-admin/indicacoes'
+      path: '/super-admin/indicacoes'
+      fullPath: '/super-admin/indicacoes'
+      preLoaderRoute: typeof SuperAdminIndicacoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signup/sucesso': {
@@ -480,6 +500,7 @@ const rootRouteChildren: RootRouteChildren = {
   TriagemRoute: TriagemRouteWithChildren,
   SignupCanceladoRoute: SignupCanceladoRoute,
   SignupSucessoRoute: SignupSucessoRoute,
+  SuperAdminIndicacoesRoute: SuperAdminIndicacoesRoute,
   SuperAdminPlanosRoute: SuperAdminPlanosRoute,
 }
 export const routeTree = rootRouteImport

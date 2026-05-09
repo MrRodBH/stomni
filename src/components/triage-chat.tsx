@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import {
-  AlertTriangle, ArrowRight, Calendar as CalendarIcon, Check, Loader2,
-  MessageSquare, Send, Share2, ShieldCheck, Sparkles,
+  AlertTriangle, ArrowRight, Calendar as CalendarIcon, Check, CheckCircle2, Loader2,
+  MessageSquare, Send, Share2, ShieldCheck, Sparkles, Star,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar } from "@/components/ui/calendar";
@@ -28,6 +29,7 @@ import {
 } from "@/lib/api";
 import { maskWhatsapp } from "@/lib/patient-session";
 import { clearPatientHint } from "@/lib/patient-hint";
+import { cn } from "@/lib/utils";
 
 const GREETING =
   "Olá! Sou o assistente de triagem da STOMNI. Conte-me, com suas palavras, o que você está sentindo. Pode descrever sintomas, dor ou dúvidas — vou te ajudar a encontrar o melhor caminho.";

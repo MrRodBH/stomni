@@ -27,7 +27,7 @@ import {
   type AttendanceType,
 } from "@/lib/api";
 import { maskWhatsapp } from "@/lib/patient-session";
-import { loadPatientHint, clearPatientHint } from "@/lib/patient-hint";
+import { clearPatientHint } from "@/lib/patient-hint";
 
 const GREETING =
   "Olá! Sou o assistente de triagem da STOMNI. Conte-me, com suas palavras, o que você está sentindo. Pode descrever sintomas, dor ou dúvidas — vou te ajudar a encontrar o melhor caminho.";
@@ -87,14 +87,8 @@ export function TriageChat({ sessionId }: TriageChatProps) {
     setSending(true);
     try {
       if (!session) {
-        const hint = loadPatientHint();
-        const s = await triageApi.createSession(
-          text,
-          undefined,
-          hint?.whatsapp ? { whatsapp: hint.whatsapp } : undefined,
-        );
-        setSession(s);
-        navigate({ to: "/triagem/$sessionId" as any, params: { sessionId: s.id } as any });
+        navigate({ to: "/triagem" });
+        return;
       } else {
         const s = await triageApi.sendMessage(session.id, text);
         setSession(s);
@@ -152,21 +146,20 @@ export function TriageChat({ sessionId }: TriageChatProps) {
               <span className="hidden md:inline">Compartilhar</span>
             </Button>
           )}
-          {!sessionId && loadPatientHint() && (
-            <Button
-              variant="ghost"
-              size="sm"
-              data-testid="chat-clear-identity-btn"
-              onClick={() => {
-                clearPatientHint();
-                toast.success("Identificação removida.");
-                navigate({ to: "/" });
-              }}
-              title="Limpar identificação salva neste dispositivo"
-            >
-              Não sou eu
-            </Button>
-          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            data-testid="chat-not-me-btn"
+            onClick={() => {
+              clearPatientHint();
+              toast.success("Identificação removida.");
+              navigate({ to: "/triagem" });
+            }}
+            title="Limpar identificação salva neste dispositivo"
+            className="text-xs text-muted-foreground hover:text-foreground"
+          >
+            Não sou eu
+          </Button>
         </header>
 
         {loading ? (

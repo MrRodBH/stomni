@@ -2,13 +2,15 @@ const KEY = "stomni_patient_hint";
 const TTL_DAYS = 30;
 
 export interface PatientHintLocal {
+  full_name: string;
   whatsapp: string;
   consent_at: string; // ISO
 }
 
-export function savePatientHint(whatsapp: string) {
+export function savePatientHint(full_name: string, whatsapp: string) {
   if (typeof localStorage === "undefined") return;
   const payload: PatientHintLocal = {
+    full_name,
     whatsapp,
     consent_at: new Date().toISOString(),
   };
@@ -21,7 +23,7 @@ export function loadPatientHint(): PatientHintLocal | null {
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw) as PatientHintLocal;
-    if (!parsed.whatsapp || !parsed.consent_at) return null;
+    if (!parsed.whatsapp || !parsed.consent_at || !parsed.full_name) return null;
     const ageMs = Date.now() - new Date(parsed.consent_at).getTime();
     if (ageMs > TTL_DAYS * 24 * 60 * 60 * 1000) {
       localStorage.removeItem(KEY);

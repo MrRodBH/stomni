@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { TriageChat } from "@/components/triage-chat";
+import { TriageEntry } from "@/components/triage-entry";
 
 export const Route = createFileRoute("/triagem")({
   head: () => ({
@@ -8,5 +8,5 @@ export const Route = createFileRoute("/triagem")({
       { name: "description", content: "Triagem conversacional com IA clínica." },
     ],
   }),
-  component: () => <TriageChat />,
+  component: () => <TriageEntry />,
 });

@@ -6,6 +6,10 @@ import {
   LayoutDashboard, Stethoscope, Users, Building2, LogOut, BookOpen,
   MessageSquare, Settings, Gift, Package, Megaphone, UsersRound,
 } from "lucide-react";
+import {
+  EmergencyAlertsProvider, useEmergencyAlerts,
+} from "@/hooks/useEmergencyAlerts";
+import { EmergencyAlertBanner } from "@/components/admin/EmergencyAlertBanner";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -34,7 +38,9 @@ const SUPER_NAV: { to: string; label: string; icon: any }[] = [
 function AdminLayout() {
   return (
     <RequireAuth roles={ADMIN_ROLES}>
-      <AdminShell />
+      <EmergencyAlertsProvider>
+        <AdminShell />
+      </EmergencyAlertsProvider>
     </RequireAuth>
   );
 }
@@ -50,7 +56,9 @@ function AdminShell() {
       <div className="mx-auto grid max-w-6xl gap-6 px-6 py-8 md:grid-cols-[220px_1fr]">
         <aside className="space-y-1">
           <div className="px-3 pb-3">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">Admin</p>
+            <p className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+              Admin <SseStatusDot />
+            </p>
             <p className="truncate text-sm font-medium">{user?.name ?? user?.email}</p>
             <p className="text-xs text-muted-foreground">{user?.role}</p>
           </div>
@@ -114,9 +122,23 @@ function AdminShell() {
           </div>
         </aside>
         <main className="min-w-0">
+          <EmergencyAlertBanner />
           <Outlet />
         </main>
       </div>
     </div>
+  );
+}
+
+function SseStatusDot() {
+  const { connected } = useEmergencyAlerts();
+  return (
+    <span
+      title={connected ? "Alertas em tempo real conectados" : "Desconectado"}
+      className={
+        "inline-block h-2 w-2 rounded-full " +
+        (connected ? "bg-emerald-500" : "bg-muted-foreground/40")
+      }
+    />
   );
 }

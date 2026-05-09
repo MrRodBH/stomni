@@ -57,12 +57,12 @@ function HomePage() {
               Atendimento seguro · LGPD
             </span>
             <h1 className="mx-auto mt-5 max-w-3xl text-4xl font-bold tracking-tight text-foreground md:text-5xl">
-              Triagem Odontológica{" "}
+              Sistema de Triagem{" "}
               <span
                 className="bg-clip-text text-transparent"
                 style={{ backgroundImage: "var(--gradient-hero)" }}
               >
-                Inteligente
+                Omnichannel
               </span>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground md:text-lg">

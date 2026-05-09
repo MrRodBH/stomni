@@ -63,8 +63,7 @@ function HomePage() {
                 style={{ backgroundImage: "var(--gradient-hero)" }}
               >
                 Inteligente
-              </span>{" "}
-              em poucos minutos
+              </span>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground md:text-lg">
               Converse com nosso assistente virtual e receba o encaminhamento

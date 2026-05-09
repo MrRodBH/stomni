@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import {
-  AlertTriangle, ArrowRight, Calendar as CalendarIcon, Check, Loader2,
-  MessageSquare, Send, Share2, ShieldCheck, Sparkles,
+  AlertTriangle, ArrowRight, Calendar as CalendarIcon, Check, CheckCircle2, Loader2,
+  MessageSquare, Send, Share2, ShieldCheck, Sparkles, Star,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar } from "@/components/ui/calendar";
@@ -28,6 +29,7 @@ import {
 } from "@/lib/api";
 import { maskWhatsapp } from "@/lib/patient-session";
 import { clearPatientHint } from "@/lib/patient-hint";
+import { cn } from "@/lib/utils";
 
 const GREETING =
   "Olá! Sou o assistente de triagem da STOMNI. Conte-me, com suas palavras, o que você está sentindo. Pode descrever sintomas, dor ou dúvidas — vou te ajudar a encontrar o melhor caminho.";
@@ -379,7 +381,11 @@ function ConfirmSuggestionDialog({
               <p className="text-xs uppercase text-muted-foreground">Protocolo</p>
               <p className="font-mono text-lg font-semibold">{done.protocol}</p>
             </div>
-            <DialogFooter>
+            <InlineCsat protocol={done.protocol} />
+            <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-between">
+              <Button asChild variant="ghost" data-testid="success-back-home">
+                <Link to="/">← Voltar ao início</Link>
+              </Button>
               <Button onClick={finish}>Concluir</Button>
             </DialogFooter>
           </>
@@ -773,7 +779,11 @@ function ScheduleStep({
             <p className="text-xs uppercase text-muted-foreground">Protocolo</p>
             <p className="font-mono text-lg font-semibold">{confirmed?.protocol}</p>
           </div>
-          <DialogFooter>
+          {confirmed && <InlineCsat protocol={confirmed.protocol} />}
+          <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-between">
+            <Button asChild variant="ghost" data-testid="success-back-home">
+              <Link to="/">← Voltar ao início</Link>
+            </Button>
             <Button onClick={() => confirmed && onConfirmed({ ...session, state: "confirmed", linked_triage_id: confirmed.protocol })}>
               Concluir
             </Button>
@@ -781,5 +791,96 @@ function ScheduleStep({
         </DialogContent>
       </Dialog>
     </Card>
+  );
+}
+
+function InlineCsat({ protocol }: { protocol: string }) {
+  const [score, setScore] = useState(0);
+  const [hover, setHover] = useState(0);
+  const [comment, setComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  async function handleSubmit() {
+    if (!score) return;
+    setSubmitting(true);
+    try {
+      await triageApi.submitCsat(protocol, {
+        score,
+        comment: comment.trim() || undefined,
+      });
+      toast.success("Obrigado pelo feedback!");
+      setSubmitted(true);
+    } catch (err: any) {
+      if (err?.response?.status === 409) {
+        toast.info("Esta avaliação já foi registrada.");
+        setSubmitted(true);
+      } else {
+        toast.error("Erro ao enviar avaliação. Tente novamente.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="border-t pt-6 mt-2">
+      <h3 className="text-base font-semibold text-foreground mb-1">
+        Como foi sua experiência?
+      </h3>
+      <p className="text-sm text-muted-foreground mb-4">
+        Sua avaliação é opcional, mas ajuda a STOMNI a melhorar.
+      </p>
+      {submitted ? (
+        <div className="text-center py-4 space-y-2" data-testid="success-csat-thanks">
+          <CheckCircle2 className="h-8 w-8 text-green-600 mx-auto" />
+          <p className="text-sm text-foreground">Obrigado pelo feedback!</p>
+        </div>
+      ) : (
+        <>
+          <div className="flex justify-center gap-2 mb-3" data-testid="success-csat-stars">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setScore(n)}
+                onMouseEnter={() => setHover(n)}
+                onMouseLeave={() => setHover(0)}
+                data-testid={`success-csat-star-${n}`}
+                className="transition-transform hover:scale-110"
+                aria-label={`${n} estrela${n > 1 ? "s" : ""}`}
+              >
+                <Star
+                  className={cn(
+                    "h-9 w-9",
+                    n <= (hover || score)
+                      ? "fill-amber-400 text-amber-400"
+                      : "fill-none text-slate-300",
+                  )}
+                />
+              </button>
+            ))}
+          </div>
+          <Textarea
+            placeholder="Conte com suas palavras (opcional)"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            maxLength={1000}
+            data-testid="success-csat-comment"
+            className="min-h-[60px] text-sm"
+          />
+          <Button
+            onClick={handleSubmit}
+            disabled={!score || submitting}
+            data-testid="success-csat-submit"
+            variant="outline"
+            className="w-full mt-3"
+            size="sm"
+          >
+            {submitting ? "Enviando..." : "Enviar avaliação"}
+          </Button>
+        </>
+      )}
+    </div>
   );
 }

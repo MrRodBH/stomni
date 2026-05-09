@@ -2,12 +2,16 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { triageApi, type ProtocolView } from "@/lib/api";
 import { SiteHeader } from "@/components/site-header";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { toast } from "sonner";
 import {
-  AlertCircle, ArrowLeft, Calendar, Clock, MapPin, MessageSquare, Sparkles, Phone, Stethoscope,
+  AlertCircle, ArrowLeft, Calendar, Clock, MapPin, MessageSquare, Sparkles, Phone, Stethoscope, Star, CheckCircle2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/triagem/protocolo/$protocol")({
@@ -89,7 +93,7 @@ function ProtocolPage() {
           <ErrorState onRetry={() => refetch()} />
         )}
 
-        {data && <ProtocolContent data={data} />}
+        {data && <ProtocolContent data={data} onCsatSubmitted={() => refetch()} />}
       </main>
     </div>
   );

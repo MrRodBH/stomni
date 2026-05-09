@@ -173,10 +173,17 @@ export const triageApi = {
   createSession: async (
     initialMessage?: string,
     tenant: string = "ten_stomni",
+    patientHint?: { whatsapp?: string; full_name?: string },
   ): Promise<TriageSession> => {
     const { data } = await api.post<TriageSession>(
       `/triage/sessions?tenant=${encodeURIComponent(tenant)}`,
-      { initial_message: initialMessage, use_rag: true },
+      {
+        initial_message: initialMessage,
+        use_rag: true,
+        ...(patientHint && Object.values(patientHint).some(Boolean)
+          ? { patient_hint: patientHint }
+          : {}),
+      },
     );
     return data;
   },

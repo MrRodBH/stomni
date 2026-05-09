@@ -183,7 +183,7 @@ export interface ProtocolView {
 export const clinicsApi = {
   list: async (): Promise<Clinic[]> => {
     try {
-      const { data } = await api.get<Clinic[]>("/clinics");
+      const { data } = await publicApi.get<Clinic[]>("/clinics");
       if (Array.isArray(data) && data.length) return data;
     } catch {}
     return [
@@ -197,7 +197,7 @@ export const clinicsApi = {
 
 export const triageApi = {
   getByProtocol: async (protocol: string): Promise<ProtocolView> => {
-    const { data } = await api.get<ProtocolView>(
+    const { data } = await publicApi.get<ProtocolView>(
       `/triage/protocol/${encodeURIComponent(protocol)}`,
     );
     return data;
@@ -208,7 +208,7 @@ export const triageApi = {
     initialMessage?: string,
     tenant: string = "ten_stomni",
   ): Promise<TriageSession> => {
-    const { data } = await api.post<TriageSession>(
+    const { data } = await publicApi.post<TriageSession>(
       `/triage/sessions?tenant=${encodeURIComponent(tenant)}`,
       {
         initial_message: initialMessage,
@@ -219,11 +219,11 @@ export const triageApi = {
     return data;
   },
   getSession: async (id: string): Promise<TriageSession> => {
-    const { data } = await api.get<TriageSession>(`/triage/sessions/${id}`);
+    const { data } = await publicApi.get<TriageSession>(`/triage/sessions/${id}`);
     return data;
   },
   sendMessage: async (id: string, message: string): Promise<TriageSession> => {
-    const { data } = await api.post<TriageSession>(
+    const { data } = await publicApi.post<TriageSession>(
       `/triage/sessions/${id}/messages`,
       { message, use_rag: true },
     );
@@ -239,7 +239,7 @@ export const triageApi = {
       files?: { name: string; size: number }[];
     },
   ): Promise<TriageProcessResponse> => {
-    const { data } = await api.post<TriageProcessResponse>(
+    const { data } = await publicApi.post<TriageProcessResponse>(
       `/triage/sessions/${id}/finalize`,
       payload,
     );
@@ -250,7 +250,7 @@ export const triageApi = {
     id: string,
     patient: { full_name: string; whatsapp: string; clinic_id: string; consent: boolean; email?: string },
   ): Promise<TriageProcessResponse> => {
-    const { data } = await api.post<TriageProcessResponse>(
+    const { data } = await publicApi.post<TriageProcessResponse>(
       `/triage/sessions/${id}/confirm-suggestion`,
       patient,
     );
@@ -260,7 +260,7 @@ export const triageApi = {
   // ===== Legacy single-shot triage (kept for compat) =====
   process: async (payload: TriageProcessRequest): Promise<TriageProcessResponse> => {
     try {
-      const { data } = await api.post<TriageProcessResponse>("/triage/process", payload);
+      const { data } = await publicApi.post<TriageProcessResponse>("/triage/process", payload);
       return data;
     } catch {
       const cls: UrgencyLevel =
@@ -274,7 +274,7 @@ export const triageApi = {
   },
   availability: async (date: string): Promise<AppointmentSlot[]> => {
     try {
-      const { data } = await api.get<AppointmentSlot[]>("/appointments/availability", {
+      const { data } = await publicApi.get<AppointmentSlot[]>("/appointments/availability", {
         params: { date },
       });
       if (Array.isArray(data) && data.length) return data;
@@ -836,7 +836,7 @@ export interface CheckoutStatus {
 
 export const billingApi = {
   listPlans: async () =>
-    (await api.get<{ plans: Plan[] }>("/billing/plans")).data,
+    (await publicApi.get<{ plans: Plan[] }>("/billing/plans")).data,
   signup: async (payload: {
     clinic_name: string;
     contact_email: string;
@@ -844,9 +844,9 @@ export const billingApi = {
     plan_id: string;
     origin_url: string;
     referral_code?: string;
-  }) => (await api.post<SignupResponse>("/signup/tenant", payload)).data,
+  }) => (await publicApi.post<SignupResponse>("/signup/tenant", payload)).data,
   checkoutStatus: async (sessionId: string) =>
-    (await api.get<CheckoutStatus>(`/billing/checkout/status/${sessionId}`)).data,
+    (await publicApi.get<CheckoutStatus>(`/billing/checkout/status/${sessionId}`)).data,
 };
 
 // ===== Abandonment Analytics (Fase 5) =====
@@ -976,7 +976,7 @@ export const referralApi = {
   me: async (): Promise<MyReferral> =>
     (await api.get<MyReferral>("/admin/referral")).data,
   lookupCode: async (code: string): Promise<ReferralCodeLookup> =>
-    (await api.get<ReferralCodeLookup>(`/billing/referral-code/${code}`)).data,
+    (await publicApi.get<ReferralCodeLookup>(`/billing/referral-code/${code}`)).data,
 };
 
 // ===== Patient Profiles (Fase 5.8) =====

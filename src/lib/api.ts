@@ -169,6 +169,7 @@ export interface ProtocolView {
   classification: UrgencyLevel | string;
   urgency_score: number;
   specialty: string | null;
+  professional_name: string | null;
   attendance_type: AttendanceType | string;
   date: string;
   time: string;

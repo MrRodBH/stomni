@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  AlertCircle, Calendar, Clock, MapPin, MessageSquare, Sparkles, Phone,
+  AlertCircle, ArrowLeft, Calendar, Clock, MapPin, MessageSquare, Sparkles, Phone, Stethoscope,
 } from "lucide-react";
 
 export const Route = createFileRoute("/triagem/protocolo/$protocol")({
@@ -71,6 +71,14 @@ function ProtocolPage() {
     <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 md:py-14">
+        <Link
+          to="/"
+          data-testid="protocol-page-back"
+          className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Voltar ao início
+        </Link>
         {isLoading && <LoadingState />}
 
         {isError && (status === 404 || status === 400) && (
@@ -178,6 +186,15 @@ function ProtocolContent({ data }: { data: ProtocolView }) {
             <p className="mt-0.5 flex items-center gap-1 text-2xl font-bold tracking-tight text-primary">
               <Clock className="h-5 w-5" /> {data.time}
             </p>
+            {data.professional_name && (
+              <div
+                data-testid="protocol-page-professional"
+                className="mt-2 flex items-center gap-2 text-sm text-muted-foreground"
+              >
+                <Stethoscope className="h-4 w-4" />
+                <span>{data.professional_name}</span>
+              </div>
+            )}
           </div>
         </div>
       </Card>
@@ -230,6 +247,12 @@ function ProtocolContent({ data }: { data: ProtocolView }) {
           )}
         </div>
       </Card>
+
+      <div className="flex justify-center pt-2">
+        <Button asChild variant="outline" data-testid="protocol-page-back-bottom">
+          <Link to="/">← Voltar ao início</Link>
+        </Button>
+      </div>
     </div>
   );
 }

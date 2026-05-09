@@ -169,6 +169,12 @@ export const clinicsApi = {
 };
 
 export const triageApi = {
+  getByProtocol: async (protocol: string): Promise<ProtocolView> => {
+    const { data } = await api.get<ProtocolView>(
+      `/triage/protocol/${encodeURIComponent(protocol)}`,
+    );
+    return data;
+  },
   // ===== Multi-turn triage sessions (RAG) =====
   createSession: async (
     patientHint: { full_name: string; whatsapp: string; consent: boolean },

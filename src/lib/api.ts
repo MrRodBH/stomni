@@ -3,7 +3,7 @@ import { toast } from "sonner";
 
 const API_URL =
   (import.meta as any).env?.VITE_API_URL ||
-  "https://smart-dental-clinic.preview.emergentagent.com/api/v1";
+  "https://patient-portal-321.preview.emergentagent.com/api/v1";
 
 function getCookie(name: string): string | null {
   if (typeof document === "undefined") return null;

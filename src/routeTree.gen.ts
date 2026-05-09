@@ -75,9 +75,9 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   getParentRoute: () => AdminRoute,
 } as any)
 const TriagemSessionIdRoute = TriagemSessionIdRouteImport.update({
-  id: '/$sessionId',
-  path: '/$sessionId',
-  getParentRoute: () => TriagemRoute,
+  id: '/triagem/$sessionId',
+  path: '/triagem/$sessionId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SuperAdminPlanosRoute = SuperAdminPlanosRouteImport.update({
   id: '/super-admin/planos',
@@ -141,9 +141,9 @@ const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
 } as any)
 const TriagemProtocoloProtocolRoute =
   TriagemProtocoloProtocolRouteImport.update({
-    id: '/protocolo/$protocol',
-    path: '/protocolo/$protocol',
-    getParentRoute: () => TriagemRoute,
+    id: '/triagem/protocolo/$protocol',
+    path: '/triagem/protocolo/$protocol',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const AdminPacientesIdRoute = AdminPacientesIdRouteImport.update({
   id: '/$id',
@@ -326,7 +326,9 @@ export interface RootRouteChildren {
   SignupSucessoRoute: typeof SignupSucessoRoute
   SuperAdminIndicacoesRoute: typeof SuperAdminIndicacoesRoute
   SuperAdminPlanosRoute: typeof SuperAdminPlanosRoute
+  TriagemSessionIdRoute: typeof TriagemSessionIdRoute
   TriagemIndexRoute: typeof TriagemIndexRoute
+  TriagemProtocoloProtocolRoute: typeof TriagemProtocoloProtocolRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -389,10 +391,10 @@ declare module '@tanstack/react-router' {
     }
     '/triagem/$sessionId': {
       id: '/triagem/$sessionId'
-      path: '/$sessionId'
+      path: '/triagem/$sessionId'
       fullPath: '/triagem/$sessionId'
       preLoaderRoute: typeof TriagemSessionIdRouteImport
-      parentRoute: typeof TriagemRoute
+      parentRoute: typeof rootRouteImport
     }
     '/super-admin/planos': {
       id: '/super-admin/planos'
@@ -480,10 +482,10 @@ declare module '@tanstack/react-router' {
     }
     '/triagem/protocolo/$protocol': {
       id: '/triagem/protocolo/$protocol'
-      path: '/protocolo/$protocol'
+      path: '/triagem/protocolo/$protocol'
       fullPath: '/triagem/protocolo/$protocol'
       preLoaderRoute: typeof TriagemProtocoloProtocolRouteImport
-      parentRoute: typeof TriagemRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/pacientes/$id': {
       id: '/admin/pacientes/$id'
@@ -562,18 +564,10 @@ const rootRouteChildren: RootRouteChildren = {
   SignupSucessoRoute: SignupSucessoRoute,
   SuperAdminIndicacoesRoute: SuperAdminIndicacoesRoute,
   SuperAdminPlanosRoute: SuperAdminPlanosRoute,
+  TriagemSessionIdRoute: TriagemSessionIdRoute,
   TriagemIndexRoute: TriagemIndexRoute,
+  TriagemProtocoloProtocolRoute: TriagemProtocoloProtocolRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -41,7 +41,7 @@ function HomePage() {
     e.preventDefault();
     const p = protocol.trim();
     if (!p) return;
-    toast.info("Acompanhamento por protocolo em breve.");
+    navigate({ to: "/triagem/protocolo/$protocol", params: { protocol: p } });
   };
 
   return (

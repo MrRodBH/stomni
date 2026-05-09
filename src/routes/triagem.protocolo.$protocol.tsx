@@ -145,7 +145,7 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
   );
 }
 
-function ProtocolContent({ data }: { data: ProtocolView }) {
+function ProtocolContent({ data, onCsatSubmitted }: { data: ProtocolView; onCsatSubmitted: () => void }) {
   const statusLabel = STATUS_LABEL[data.status] ?? data.status;
   const classLabel = CLASSIFICATION_LABEL[data.classification] ?? data.classification;
 
@@ -253,10 +253,122 @@ function ProtocolContent({ data }: { data: ProtocolView }) {
       </Card>
 
       <div className="flex justify-center pt-2">
+        <CsatSection data={data} onSubmitted={onCsatSubmitted} />
+      </div>
+
+      <div className="flex justify-center pt-2">
         <Button asChild variant="outline" data-testid="protocol-page-back-bottom">
           <Link to="/">← Voltar ao início</Link>
         </Button>
       </div>
     </div>
+  );
+}
+
+function CsatSection({ data, onSubmitted }: { data: ProtocolView; onSubmitted: () => void }) {
+  const [score, setScore] = useState(0);
+  const [hover, setHover] = useState(0);
+  const [comment, setComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  if (data.csat_score) {
+    return (
+      <Card className="w-full bg-green-50 border-green-200" data-testid="csat-thank-you">
+        <CardContent className="text-center py-8 space-y-2">
+          <CheckCircle2 className="h-12 w-12 text-green-600 mx-auto" />
+          <h3 className="text-lg font-semibold text-foreground">Obrigado pela sua avaliação!</h3>
+          <div className="flex justify-center gap-1">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <Star
+                key={n}
+                className={cn(
+                  "h-6 w-6",
+                  n <= (data.csat_score ?? 0)
+                    ? "fill-amber-400 text-amber-400"
+                    : "fill-none text-slate-300",
+                )}
+              />
+            ))}
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Seu feedback ajuda a STOMNI a melhorar o atendimento.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  async function handleSubmit() {
+    if (!score) return;
+    setSubmitting(true);
+    try {
+      await triageApi.submitCsat(data.protocol, {
+        score,
+        comment: comment.trim() || undefined,
+      });
+      toast.success("Avaliação enviada! Obrigado.");
+      onSubmitted();
+    } catch (err: any) {
+      if (err?.response?.status === 409) {
+        toast.error("Esta triagem já foi avaliada.");
+        onSubmitted();
+      } else {
+        toast.error("Erro ao enviar avaliação. Tente novamente.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <Card className="w-full" data-testid="csat-card">
+      <CardHeader>
+        <CardTitle>Como foi sua experiência?</CardTitle>
+        <CardDescription>
+          Sua avaliação ajuda a STOMNI a melhorar o atendimento.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex justify-center gap-2" data-testid="csat-stars">
+          {[1, 2, 3, 4, 5].map((n) => (
+            <button
+              key={n}
+              type="button"
+              onClick={() => setScore(n)}
+              onMouseEnter={() => setHover(n)}
+              onMouseLeave={() => setHover(0)}
+              data-testid={`csat-star-${n}`}
+              className="transition-transform hover:scale-110"
+              aria-label={`${n} estrela${n > 1 ? "s" : ""}`}
+            >
+              <Star
+                className={cn(
+                  "h-9 w-9",
+                  n <= (hover || score)
+                    ? "fill-amber-400 text-amber-400"
+                    : "fill-none text-slate-300",
+                )}
+              />
+            </button>
+          ))}
+        </div>
+        <Textarea
+          placeholder="Conte com suas palavras (opcional)"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          maxLength={1000}
+          data-testid="csat-comment"
+          className="min-h-[80px]"
+        />
+        <Button
+          onClick={handleSubmit}
+          disabled={!score || submitting}
+          data-testid="csat-submit"
+          className="w-full"
+        >
+          {submitting ? "Enviando..." : "Enviar avaliação"}
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

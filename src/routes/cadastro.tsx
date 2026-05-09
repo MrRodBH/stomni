@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { Loader2, Gift } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -178,7 +177,6 @@ function SignupPage() {
           </aside>
         </div>
       </main>
-      <SiteFooter />
     </div>
   );
 }

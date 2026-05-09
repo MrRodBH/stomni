@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Check, Sparkles } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -79,7 +78,6 @@ function PricingPage() {
           Pagamentos processados com segurança via Stripe. Cancele quando quiser.
         </p>
       </main>
-      <SiteFooter />
     </div>
   );
 }

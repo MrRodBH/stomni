@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { XCircle } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -31,7 +30,6 @@ function SignupCanceled() {
           </div>
         </Card>
       </main>
-      <SiteFooter />
     </div>
   );
 }

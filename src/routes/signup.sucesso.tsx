@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { billingApi, type CheckoutStatus } from "@/lib/api";
@@ -115,7 +114,6 @@ function SignupSuccess() {
           )}
         </Card>
       </main>
-      <SiteFooter />
     </div>
   );
 }

@@ -308,6 +308,7 @@ function ConfirmSuggestionDialog({
 }) {
   const [name, setName] = useState(session.patient_hint?.full_name ?? "");
   const [phone, setPhone] = useState(session.patient_hint?.whatsapp ?? "");
+  const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<{ protocol: string; classification: string; message: string } | null>(null);
@@ -326,6 +327,7 @@ function ConfirmSuggestionDialog({
         whatsapp: phone,
         clinic_id: session.suggested_booking?.clinic_id ?? "",
         consent: true,
+        email: email.trim() || undefined,
       });
       setDone(res);
     } catch {
@@ -394,6 +396,20 @@ function ConfirmSuggestionDialog({
                   placeholder="(11) 99999-9999"
                   inputMode="tel"
                 />
+              </div>
+              <div>
+                <Label htmlFor="cf-email">Email (opcional)</Label>
+                <Input
+                  id="cf-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="seu@email.com"
+                  data-testid="patient-email-input"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Se preenchido, enviaremos a confirmação do agendamento por email.
+                </p>
               </div>
               <label className="flex items-start gap-2 rounded-md border border-border bg-muted/30 p-3 text-sm">
                 <Checkbox
@@ -545,6 +561,7 @@ function ScheduleStep({
   const [clinics, setClinics] = useState<Clinic[]>([]);
   const [name, setName] = useState(session.patient_hint?.full_name ?? "");
   const [phone, setPhone] = useState(session.patient_hint?.whatsapp ?? "");
+  const [email, setEmail] = useState("");
   const [clinicId, setClinicId] = useState(
     session.suggested_booking?.clinic_id ?? session.patient_hint?.clinic_id ?? "",
   );
@@ -581,7 +598,13 @@ function ScheduleStep({
     setSubmitting(true);
     try {
       const res = await triageApi.finalize(session.id, {
-        patient: { full_name: name.trim(), whatsapp: phone, clinic_id: clinicId, consent: true },
+        patient: {
+          full_name: name.trim(),
+          whatsapp: phone,
+          clinic_id: clinicId,
+          consent: true,
+          email: email.trim() || undefined,
+        },
         attendance_type: type,
         date: format(date, "yyyy-MM-dd"),
         time,
@@ -617,6 +640,20 @@ function ScheduleStep({
             placeholder="(11) 99999-9999"
             inputMode="tel"
           />
+        </div>
+        <div className="sm:col-span-2">
+          <Label htmlFor="em">Email (opcional)</Label>
+          <Input
+            id="em"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="seu@email.com"
+            data-testid="patient-email-input"
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Se preenchido, enviaremos a confirmação do agendamento por email.
+          </p>
         </div>
         <div>
           <Label>Clínica</Label>

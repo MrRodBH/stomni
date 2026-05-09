@@ -561,6 +561,7 @@ function ScheduleStep({
   const [clinics, setClinics] = useState<Clinic[]>([]);
   const [name, setName] = useState(session.patient_hint?.full_name ?? "");
   const [phone, setPhone] = useState(session.patient_hint?.whatsapp ?? "");
+  const [email, setEmail] = useState("");
   const [clinicId, setClinicId] = useState(
     session.suggested_booking?.clinic_id ?? session.patient_hint?.clinic_id ?? "",
   );
@@ -597,7 +598,13 @@ function ScheduleStep({
     setSubmitting(true);
     try {
       const res = await triageApi.finalize(session.id, {
-        patient: { full_name: name.trim(), whatsapp: phone, clinic_id: clinicId, consent: true },
+        patient: {
+          full_name: name.trim(),
+          whatsapp: phone,
+          clinic_id: clinicId,
+          consent: true,
+          email: email.trim() || undefined,
+        },
         attendance_type: type,
         date: format(date, "yyyy-MM-dd"),
         time,
@@ -633,6 +640,20 @@ function ScheduleStep({
             placeholder="(11) 99999-9999"
             inputMode="tel"
           />
+        </div>
+        <div className="sm:col-span-2">
+          <Label htmlFor="em">Email (opcional)</Label>
+          <Input
+            id="em"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="seu@email.com"
+            data-testid="patient-email-input"
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Se preenchido, enviaremos a confirmação do agendamento por email.
+          </p>
         </div>
         <div>
           <Label>Clínica</Label>

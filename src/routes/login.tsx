@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useAuth, useLogin, isAdminRole } from "@/lib/auth";
 import logoUrl from "@/assets/stomni-logo.jpeg";
 import { Loader2 } from "lucide-react";
+import { SiteHeader } from "@/components/site-header";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -45,7 +46,9 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen grid place-items-center bg-background px-4 py-12">
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+      <div className="grid place-items-center px-4 py-12">
       <Card className="w-full max-w-md p-8 shadow-lg">
         <div className="flex flex-col items-center text-center">
           <img src={logoUrl} alt="STOMNI" className="h-14 w-auto rounded-md" />
@@ -95,6 +98,7 @@ function LoginPage() {
           <Link to="/" className="hover:text-foreground">← Voltar ao site</Link>
         </p>
       </Card>
+      </div>
     </div>
   );
 }

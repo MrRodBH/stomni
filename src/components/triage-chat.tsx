@@ -308,6 +308,7 @@ function ConfirmSuggestionDialog({
 }) {
   const [name, setName] = useState(session.patient_hint?.full_name ?? "");
   const [phone, setPhone] = useState(session.patient_hint?.whatsapp ?? "");
+  const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<{ protocol: string; classification: string; message: string } | null>(null);
@@ -326,6 +327,7 @@ function ConfirmSuggestionDialog({
         whatsapp: phone,
         clinic_id: session.suggested_booking?.clinic_id ?? "",
         consent: true,
+        email: email.trim() || undefined,
       });
       setDone(res);
     } catch {
@@ -394,6 +396,20 @@ function ConfirmSuggestionDialog({
                   placeholder="(11) 99999-9999"
                   inputMode="tel"
                 />
+              </div>
+              <div>
+                <Label htmlFor="cf-email">Email (opcional)</Label>
+                <Input
+                  id="cf-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="seu@email.com"
+                  data-testid="patient-email-input"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Se preenchido, enviaremos a confirmação do agendamento por email.
+                </p>
               </div>
               <label className="flex items-start gap-2 rounded-md border border-border bg-muted/30 p-3 text-sm">
                 <Checkbox

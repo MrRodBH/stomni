@@ -74,6 +74,7 @@ export interface PatientInfo {
   whatsapp: string;
   clinic_id: string;
   consent: boolean;
+  email?: string;
 }
 
 export interface AppointmentSlot {

@@ -18,6 +18,16 @@ export const api = axios.create({
   timeout: 15000,
 });
 
+// Public client for endpoints that DO NOT use cookies (triage, plans, signup,
+// protocol lookup, etc). Sending credentials to these endpoints is rejected
+// by CORS because the upstream returns Access-Control-Allow-Origin: *.
+export const publicApi = axios.create({
+  baseURL: API_URL,
+  headers: { "Content-Type": "application/json" },
+  withCredentials: false,
+  timeout: 15000,
+});
+
 api.interceptors.request.use((config) => {
   const token =
     getCookie("stomni_jwt") ||

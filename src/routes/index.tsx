@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
@@ -41,7 +40,7 @@ function HomePage() {
     e.preventDefault();
     const p = protocol.trim();
     if (!p) return;
-    toast.info("Acompanhamento por protocolo em breve.");
+    navigate({ to: "/triagem/protocolo/$protocol", params: { protocol: p } });
   };
 
   return (

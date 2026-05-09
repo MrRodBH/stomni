@@ -153,6 +153,23 @@ export interface KnowledgeDocument {
   uploaded_at: string;
 }
 
+export interface ProtocolView {
+  protocol: string;
+  status: "scheduled" | "completed" | "cancelled" | string;
+  classification: UrgencyLevel | string;
+  urgency_score: number;
+  specialty: string | null;
+  attendance_type: AttendanceType | string;
+  date: string;
+  time: string;
+  clinic_name: string | null;
+  ai_message: string | null;
+  main_complaint: string | null;
+  csat_score: number | null;
+  patient: { full_name: string; whatsapp_masked: string };
+  created_at: string;
+}
+
 export const clinicsApi = {
   list: async (): Promise<Clinic[]> => {
     try {
@@ -169,6 +186,12 @@ export const clinicsApi = {
 };
 
 export const triageApi = {
+  getByProtocol: async (protocol: string): Promise<ProtocolView> => {
+    const { data } = await api.get<ProtocolView>(
+      `/triage/protocol/${encodeURIComponent(protocol)}`,
+    );
+    return data;
+  },
   // ===== Multi-turn triage sessions (RAG) =====
   createSession: async (
     patientHint: { full_name: string; whatsapp: string; consent: boolean },

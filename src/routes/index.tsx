@@ -1,11 +1,21 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from "@/components/ui/dialog";
 import {
   ShieldCheck, Sparkles, Stethoscope, ArrowRight, FileSearch,
 } from "lucide-react";
+import { loadPatientHint, savePatientHint } from "@/lib/patient-hint";
+import { maskWhatsapp } from "@/lib/patient-session";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,6 +38,23 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const navigate = useNavigate();
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [protocol, setProtocol] = useState("");
+
+  const handleStart = () => {
+    if (loadPatientHint()) {
+      navigate({ to: "/triagem" });
+    } else {
+      setShowOnboarding(true);
+    }
+  };
+
+  const handleProtocolSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const p = protocol.trim();
+    if (!p) return;
+    toast.info("Acompanhamento por protocolo em breve.");
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -63,7 +90,7 @@ function HomePage() {
             <Card
               className="group flex cursor-pointer flex-col justify-between gap-4 p-6 transition hover:-translate-y-0.5 hover:shadow-lg md:p-7"
               style={{ boxShadow: "var(--shadow-soft)" }}
-              onClick={() => navigate({ to: "/triagem" })}
+              onClick={handleStart}
             >
               <div>
                 <div className="grid h-11 w-11 place-items-center rounded-lg bg-primary text-primary-foreground">
@@ -75,16 +102,13 @@ function HomePage() {
                   avaliação rápida e segura.
                 </p>
               </div>
-              <Button size="lg" className="w-full">
+              <Button size="lg" className="w-full" onClick={(e) => { e.stopPropagation(); handleStart(); }}>
                 Começar agora <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Card>
 
             <Card
-              className="group flex cursor-pointer flex-col justify-between gap-4 p-6 transition hover:-translate-y-0.5 hover:shadow-lg md:p-7"
-              onClick={() => {
-                /* placeholder */
-              }}
+              className="group flex flex-col justify-between gap-4 p-6 transition hover:-translate-y-0.5 hover:shadow-lg md:p-7"
             >
               <div>
                 <div className="grid h-11 w-11 place-items-center rounded-lg bg-accent text-primary">
@@ -92,13 +116,26 @@ function HomePage() {
                 </div>
                 <h2 className="mt-4 text-lg font-bold">Já tem protocolo?</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Acompanhe o status do seu atendimento informando o número do
-                  protocolo.
+                  Informe seu protocolo para acompanhar o atendimento.
                 </p>
               </div>
-              <Button size="lg" variant="outline" className="w-full" disabled>
-                Acompanhar (em breve)
-              </Button>
+              <form className="flex flex-col gap-2 sm:flex-row" onSubmit={handleProtocolSubmit}>
+                <Input
+                  data-testid="card-protocol-input"
+                  value={protocol}
+                  onChange={(e) => setProtocol(e.target.value.toUpperCase())}
+                  placeholder="STM-A1B2C3"
+                  className="flex-1"
+                />
+                <Button
+                  type="submit"
+                  variant="outline"
+                  data-testid="card-protocol-submit"
+                  disabled={!protocol.trim()}
+                >
+                  Acompanhar
+                </Button>
+              </form>
             </Card>
           </div>
 
@@ -122,7 +159,80 @@ function HomePage() {
         </div>
       </section>
       <SiteFooter />
+      <OnboardingDialog
+        open={showOnboarding}
+        onOpenChange={setShowOnboarding}
+        onConfirmed={(whatsapp) => {
+          savePatientHint(whatsapp);
+          setShowOnboarding(false);
+          navigate({ to: "/triagem" });
+        }}
+      />
     </div>
+  );
+}
+
+function OnboardingDialog({
+  open, onOpenChange, onConfirmed,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onConfirmed: (whatsapp: string) => void;
+}) {
+  const [whatsapp, setWhatsapp] = useState("");
+  const [consent, setConsent] = useState(false);
+  const valid = /^\(\d{2}\) \d{5}-\d{4}$/.test(whatsapp) && consent;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Vamos começar</DialogTitle>
+          <DialogDescription>
+            Precisamos apenas do seu WhatsApp e do seu consentimento.
+            O resto a IA pergunta no chat.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div>
+            <Label htmlFor="ob-whatsapp">WhatsApp</Label>
+            <Input
+              id="ob-whatsapp"
+              data-testid="modal-onboarding-whatsapp"
+              value={whatsapp}
+              onChange={(e) => setWhatsapp(maskWhatsapp(e.target.value))}
+              placeholder="(11) 99999-9999"
+              inputMode="tel"
+              autoFocus
+            />
+          </div>
+          <label className="flex items-start gap-2 rounded-md border border-border bg-muted/30 p-3 text-sm">
+            <Checkbox
+              data-testid="modal-onboarding-consent"
+              checked={consent}
+              onCheckedChange={(v) => setConsent(v === true)}
+              className="mt-0.5"
+            />
+            <span className="flex-1">
+              <ShieldCheck className="mr-1 inline h-4 w-4 text-primary" />
+              Autorizo o uso dos meus dados para triagem clínica conforme a LGPD.
+            </span>
+          </label>
+        </div>
+        <DialogFooter className="flex-col sm:flex-row sm:justify-between">
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            ← Voltar
+          </Button>
+          <Button
+            data-testid="modal-onboarding-submit"
+            disabled={!valid}
+            onClick={() => onConfirmed(whatsapp)}
+          >
+            Iniciar conversa <ArrowRight className="ml-1 h-4 w-4" />
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

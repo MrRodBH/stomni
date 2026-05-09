@@ -210,7 +210,7 @@ export const triageApi = {
 
   confirmSuggestion: async (
     id: string,
-    patient: { full_name: string; whatsapp: string; clinic_id: string; consent: boolean },
+    patient: { full_name: string; whatsapp: string; clinic_id: string; consent: boolean; email?: string },
   ): Promise<TriageProcessResponse> => {
     const { data } = await api.post<TriageProcessResponse>(
       `/triage/sessions/${id}/confirm-suggestion`,

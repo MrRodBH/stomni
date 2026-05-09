@@ -381,7 +381,11 @@ function ConfirmSuggestionDialog({
               <p className="text-xs uppercase text-muted-foreground">Protocolo</p>
               <p className="font-mono text-lg font-semibold">{done.protocol}</p>
             </div>
-            <DialogFooter>
+            <InlineCsat protocol={done.protocol} />
+            <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-between">
+              <Button asChild variant="ghost" data-testid="success-back-home">
+                <Link to="/">← Voltar ao início</Link>
+              </Button>
               <Button onClick={finish}>Concluir</Button>
             </DialogFooter>
           </>

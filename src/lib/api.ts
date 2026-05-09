@@ -203,6 +203,16 @@ export const triageApi = {
     );
     return data;
   },
+  submitCsat: async (
+    protocol: string,
+    payload: { score: number; comment?: string },
+  ): Promise<{ protocol: string; csat_score: number; csat_submitted_at: string; thank_you?: string }> => {
+    const { data } = await publicApi.post(
+      `/triage/protocol/${encodeURIComponent(protocol)}/csat`,
+      payload,
+    );
+    return data;
+  },
   // ===== Multi-turn triage sessions (RAG) =====
   createSession: async (
     patientHint: { full_name: string; whatsapp: string; consent: boolean },

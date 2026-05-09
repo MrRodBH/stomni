@@ -27,6 +27,7 @@ import {
   type AttendanceType,
 } from "@/lib/api";
 import { maskWhatsapp } from "@/lib/patient-session";
+import { loadPatientHint, clearPatientHint } from "@/lib/patient-hint";
 
 const GREETING =
   "Olá! Sou o assistente de triagem da STOMNI. Conte-me, com suas palavras, o que você está sentindo. Pode descrever sintomas, dor ou dúvidas — vou te ajudar a encontrar o melhor caminho.";
@@ -86,7 +87,12 @@ export function TriageChat({ sessionId }: TriageChatProps) {
     setSending(true);
     try {
       if (!session) {
-        const s = await triageApi.createSession(text);
+        const hint = loadPatientHint();
+        const s = await triageApi.createSession(
+          text,
+          undefined,
+          hint?.whatsapp ? { whatsapp: hint.whatsapp } : undefined,
+        );
         setSession(s);
         navigate({ to: "/triagem/$sessionId" as any, params: { sessionId: s.id } as any });
       } else {
@@ -144,6 +150,21 @@ export function TriageChat({ sessionId }: TriageChatProps) {
             <Button variant="outline" size="sm" onClick={onShare} title="Copiar link da sessão">
               <Share2 className="h-4 w-4 md:mr-2" />
               <span className="hidden md:inline">Compartilhar</span>
+            </Button>
+          )}
+          {!sessionId && loadPatientHint() && (
+            <Button
+              variant="ghost"
+              size="sm"
+              data-testid="chat-clear-identity-btn"
+              onClick={() => {
+                clearPatientHint();
+                toast.success("Identificação removida.");
+                navigate({ to: "/" });
+              }}
+              title="Limpar identificação salva neste dispositivo"
+            >
+              Não sou eu
             </Button>
           )}
         </header>

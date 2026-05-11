@@ -8,19 +8,24 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SiteHeader } from "@/components/site-header";
 import { triageApi } from "@/lib/api";
-import { loadPatientHint, savePatientHint } from "@/lib/patient-hint";
+import { clearPatientHint } from "@/lib/patient-hint";
 import { maskWhatsapp } from "@/lib/patient-session";
+
+const INITIAL_FORM = { full_name: "", whatsapp: "", consent: false };
 
 export function TriageEntry() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ full_name: "", whatsapp: "", consent: false });
+  const [form, setForm] = useState(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
 
+  // Privacy: always start blank and clear any stale stored data on entry/exit.
   useEffect(() => {
-    const hint = loadPatientHint();
-    if (hint) {
-      setForm({ full_name: hint.full_name, whatsapp: hint.whatsapp, consent: true });
-    }
+    clearPatientHint();
+    setForm(INITIAL_FORM);
+    return () => {
+      clearPatientHint();
+      setForm(INITIAL_FORM);
+    };
   }, []);
 
   const isValid =
@@ -35,7 +40,6 @@ export function TriageEntry() {
     try {
       const fullName = form.full_name.trim();
       const whatsapp = form.whatsapp.trim();
-      savePatientHint(fullName, whatsapp);
       const session = await triageApi.createSession({
         full_name: fullName,
         whatsapp,

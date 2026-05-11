@@ -49,6 +49,7 @@ export function TriageChat({ sessionId }: TriageChatProps) {
   const [sending, setSending] = useState(false);
   const [step, setStep] = useState<Step>("chat");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingUserMsg, setPendingUserMsg] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Resume flow
@@ -71,9 +72,17 @@ export function TriageChat({ sessionId }: TriageChatProps) {
   }, [session?.messages.length, sending]);
 
   const messages = useMemo(() => {
-    if (session) return session.messages;
-    return [{ role: "assistant" as const, text: GREETING, ts: new Date().toISOString() }];
-  }, [session]);
+    const base = session
+      ? session.messages
+      : [{ role: "assistant" as const, text: GREETING, ts: new Date().toISOString() }];
+    if (pendingUserMsg) {
+      return [
+        ...base,
+        { role: "user" as const, text: pendingUserMsg, ts: new Date().toISOString() },
+      ];
+    }
+    return base;
+  }, [session, pendingUserMsg]);
 
   const inputDisabled =
     sending ||
@@ -87,6 +96,7 @@ export function TriageChat({ sessionId }: TriageChatProps) {
     if (!text || sending) return;
     setInput("");
     setSending(true);
+    setPendingUserMsg(text);
     try {
       if (!session) {
         navigate({ to: "/triagem" });
@@ -99,6 +109,7 @@ export function TriageChat({ sessionId }: TriageChatProps) {
       toast.error("Não foi possível enviar a mensagem. Tente novamente.");
       setInput(text);
     } finally {
+      setPendingUserMsg(null);
       setSending(false);
     }
   };
